@@ -193,6 +193,7 @@ public class WQInference extends AbstractInference<Tripartition> {
 				}
 				Quadrapartition quadm = weightCalculator2.new Quadrapartition
 						(c1,  c2, sister, remaining);
+
 				
 				Results s = weightCalculator2.getWeight(quadm);
 				Long p = s.qs;
@@ -204,13 +205,16 @@ public class WQInference extends AbstractInference<Tripartition> {
 						(c1, sister, c2, remaining);
 				s = weightCalculator2.getWeight(quad2);
 				Long a1 = s.qs;
+
 				alt1freqs.add(a1);
 				
 				Quadrapartition quad3 = weightCalculator2.new Quadrapartition
 						(c1, remaining, c2, sister);
+
 				s = weightCalculator2.getWeight(quad3);
 				Long a2 = s.qs;
 				alt2freqs.add(a2);
+
 
 				
 				quartcount.add( (c1.getClusterSize()+0l)
@@ -218,9 +222,11 @@ public class WQInference extends AbstractInference<Tripartition> {
 						* (sister.getClusterSize()+0l)
 						* (remaining.getClusterSize()+0l));
 				
+
 				Posterior pst_tmp = new Posterior((double)p,(double)a1,(double)a2,(double)s.effn);
 				double post_m = pst_tmp.getPost();
 				pst_tmp = new Posterior((double)a1,(double)p,(double)a2,(double)s.effn);
+
 				double post_a1 = pst_tmp.getPost();
 				//pst_tmp =  new Posterior((double)a2,(double)p,(double)a1,(double)numTrees);
 				double post_a2 = 1.0 - post_a1 - post_m;
