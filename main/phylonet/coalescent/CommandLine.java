@@ -19,6 +19,7 @@ import java.util.Map;
 import java.util.Random;
 import java.util.Set;
 import java.util.Stack;
+import java.util.TreeSet;
 
 import phylonet.tree.io.NewickReader;
 import phylonet.tree.io.ParseException;
@@ -566,6 +567,7 @@ public class CommandLine {
     	List<Integer> skipped = new Stack<Integer>();
     	int l = 0;			
     	try {
+			TreeSet<String> allleaves = new TreeSet<String>();
     		for (String line : lines) {
     			l++;
     			Set<String> previousTreeTaxa = new HashSet<String>();
@@ -605,17 +607,18 @@ public class CommandLine {
     				if (stLablel) {
     					GlobalMaps.taxonNameMap.getSpeciesIdMapper().stToGt((MutableTree) tr);
     				}
-    				String[] leaves = tr.getLeaves();
-    				for (int i = 0; i < leaves.length; i++) {
-    					//if (!stLablel) {
-    						GlobalMaps.taxonIdentifier.taxonId(leaves[i]);
-    						//} else {
-    						//   GlobalMaps.taxonNameMap.getSpeciesIdMapper().speciesId(leaves[i]);
-    						//}
-    				}
+    				String[] leaves = tr.getLeaves().clone();
+    				allleaves.addAll(Arrays.asList(leaves));
     			}
 
     		}
+			for (String leaf: allleaves) {
+				//if (!stLablel) {
+					GlobalMaps.taxonIdentifier.taxonId(leaf);
+					//} else {
+					//   GlobalMaps.taxonNameMap.getSpeciesIdMapper().speciesId(leaves[i]);
+					//}
+			}
     	} catch (ParseException e) {
     		throw new RuntimeException("Failed to Parse Tree number: " + l ,e);
     	}

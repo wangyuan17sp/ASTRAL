@@ -185,44 +185,61 @@ public class WQInference extends AbstractInference<Tripartition> {
 					pc = pcit.next();
 					if (pc == n) pc = pcit.next(); 
 					remaining = (STITreeCluster)pc.getData();;					
-				} else {
+				} else if (node.getParent().isRoot() && node.getParent().getChildCount() == 2) {
+					continue;
+				}
+				else {
 					remaining = ((STITreeCluster)node.getParent().getData()).complementaryCluster();
 				}
-				Quadrapartition quad = weightCalculator2.new Quadrapartition
+				Quadrapartition quadm = weightCalculator2.new Quadrapartition
 						(c1,  c2, sister, remaining);
-				Results s = weightCalculator2.getWeight(quad);
+				
+				Results s = weightCalculator2.getWeight(quadm);
+				Long p = s.qs;
 				mainfreqs.add(s.qs);
 				effn.add(s.effn);
-				//System.err.println(s.effn + " " + quad);
 				
-				quad = weightCalculator2.new Quadrapartition
+				
+				Quadrapartition quad2 = weightCalculator2.new Quadrapartition
 						(c1, sister, c2, remaining);
-				s = weightCalculator2.getWeight(quad);
-				alt1freqs.add(s.qs);
+				s = weightCalculator2.getWeight(quad2);
+				Long a1 = s.qs;
+				alt1freqs.add(a1);
 				
-				quad = weightCalculator2.new Quadrapartition
+				Quadrapartition quad3 = weightCalculator2.new Quadrapartition
 						(c1, remaining, c2, sister);
-				s = weightCalculator2.getWeight(quad);
-				alt2freqs.add(s.qs);
+				s = weightCalculator2.getWeight(quad3);
+				Long a2 = s.qs;
+				alt2freqs.add(a2);
+
 				
 				quartcount.add( (c1.getClusterSize()+0l)
 						* (c2.getClusterSize()+0l)
 						* (sister.getClusterSize()+0l)
 						* (remaining.getClusterSize()+0l));
+				
+				Posterior pst_tmp = new Posterior((double)p,(double)a1,(double)a2,(double)s.effn);
+				double post_m = pst_tmp.getPost();
+				pst_tmp = new Posterior((double)a1,(double)p,(double)a2,(double)s.effn);
+				double post_a1 = pst_tmp.getPost();
+				//pst_tmp =  new Posterior((double)a2,(double)p,(double)a1,(double)numTrees);
+				double post_a2 = 1.0 - post_a1 - post_m;
+						
+				System.err.println(quadm +
+						" ["+cluster.getBitSet().toString2()+"|"+cluster.complementaryCluster().getBitSet().toString2()+"] : "+post_m);
+				System.err.println(quad2+" : "+post_a1);
+				System.err.println(quad3+" : "+post_a2);
 			}
 		}
 		int i = 0;
 		for (TNode n: st.postTraverse()) {
 			STINode node = (STINode) n;
 			if (node.isLeaf() || node.isRoot() ||
-					(node.getParent().isRoot() && node.getParent().getChildCount() ==2)) {
+					(node.getParent().isRoot() && node.getParent().getChildCount() ==2) ||
+					  node.getChildCount() > 2 || (node.getParent().getChildCount() >3) ||
+						(node.getParent().getChildCount() >2 && !node.getParent().isRoot())) {
 				node.setData(null);
 			} else{
-				if (node.isRoot() || node.getChildCount() > 2 || (node.getParent().getChildCount() >3) ||
-						(node.getParent().getChildCount() >2 && !node.getParent().isRoot()) ) {
-					node.setData(null);
-					continue;
-				}
 				Long p = mainfreqs.get(i);
 				Long a1 = alt1freqs.get(i);
 				Long a2 = alt2freqs.get(i);
