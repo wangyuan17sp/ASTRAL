@@ -245,59 +245,59 @@ class BipartitionWeightCalculator extends AbstractWeightCalculator<Tripartition>
 		}
 		
 		private void initialize(STITreeCluster c1, STITreeCluster c2,
-                STITreeCluster c3, STITreeCluster c4) {
-            if (c1 == null || c2 == null || c3 == null) {
-                throw new RuntimeException("none cluster" +c1+" "+c2+" "+c3);
-            }
-            int n1 = c1.getBitSet().nextSetBit(0), n2 = c2.getBitSet().nextSetBit(0), 
-                    n3 = c3.getBitSet().nextSetBit(0), n4=c4.getBitSet().nextSetBit(0);
-            int ntg1;
-            int ntg2;
-            STITreeCluster cluster_tmp1;
-            STITreeCluster cluster_tmp2;    
-            STITreeCluster cluster_tmp3;
-            STITreeCluster cluster_tmp4;
-            if (n1 < n2 ) {
-                ntg1 = n1;
-                cluster_tmp1 = c1;
-                cluster_tmp2 = c2;
-            }
-            else {
-                ntg1 = n2;
-                cluster_tmp1 = c2;
-                cluster_tmp2 = c1;
-            }
-            if (n3<n4) {
-                ntg2 = n3;
-                cluster_tmp3 = c3;
-                cluster_tmp4 = c4;
-            }
-            else {
-                ntg2 = n4;
-                cluster_tmp3 = c4;
-                cluster_tmp4 = c3;
-            }
-            
-            if(ntg1<ntg2){
-                cluster1 = cluster_tmp1;
-                cluster2 = cluster_tmp2;
-                cluster3 = cluster_tmp3;
-                cluster4 = cluster_tmp4;
-            }
-            else{
-                cluster1 = cluster_tmp3;
-                cluster2 = cluster_tmp4;
-                cluster3 = cluster_tmp1;
-                cluster4 = cluster_tmp2;
-            }
-        }
+				STITreeCluster c3, STITreeCluster c4) {
+			if (c1 == null || c2 == null || c3 == null) {
+				throw new RuntimeException("none cluster" +c1+" "+c2+" "+c3);
+			}
+			int n1 = c1.getBitSet().nextSetBit(0), n2 = c2.getBitSet().nextSetBit(0), 
+					n3 = c3.getBitSet().nextSetBit(0), n4=c4.getBitSet().nextSetBit(0);
+			int ntg1;
+			int ntg2;
+			STITreeCluster cluster_tmp1;
+			STITreeCluster cluster_tmp2;	
+			STITreeCluster cluster_tmp3;
+			STITreeCluster cluster_tmp4;
+			if (n1 < n2 ) {
+				ntg1 = n1;
+				cluster_tmp1 = c1;
+				cluster_tmp2 = c2;
+			}
+			else {
+				ntg1 = n2;
+				cluster_tmp1 = c2;
+				cluster_tmp2 = c1;
+			}
+			if (n3<n4) {
+				ntg2 = n3;
+				cluster_tmp3 = c3;
+				cluster_tmp4 = c4;
+			}
+			else {
+				ntg2 = n4;
+				cluster_tmp3 = c4;
+				cluster_tmp4 = c3;
+			}
+			
+			if(ntg1<ntg2){
+				cluster1 = cluster_tmp1;
+				cluster2 = cluster_tmp2;
+				cluster3 = cluster_tmp3;
+				cluster4 = cluster_tmp4;
+			}
+			else{
+				cluster1 = cluster_tmp3;
+				cluster2 = cluster_tmp4;
+				cluster3 = cluster_tmp1;
+				cluster4 = cluster_tmp2;
+			}
+		}
 
 		@Override
 		public boolean equals(Object obj) {
 			Quadrapartition trip = (Quadrapartition) obj; 
 
 			return this == obj ||
-					((trip.cluster1.equals(this.cluster1) && 
+						  ((trip.cluster1.equals(this.cluster1) && 
 							trip.cluster2.equals(this.cluster2) && 
 							trip.cluster4.equals(this.cluster4) && 
 							trip.cluster3.equals(this.cluster3)));					
@@ -312,8 +312,8 @@ class BipartitionWeightCalculator extends AbstractWeightCalculator<Tripartition>
 		}
 		@Override
 		public String toString() {		
-			return cluster1.getBitSet().toString2()+"|"+cluster2.getBitSet().toString2().toString()+
-					"#"+cluster3.getBitSet().toString2().toString()+"|"+cluster4.getBitSet().toString2().toString();
+			return cluster1.getBitSet().toString2()+"|"+cluster2.getBitSet().toString2()+
+					"#"+cluster3.getBitSet().toString2()+"|"+cluster4.getBitSet().toString2();
 		}
 
 
