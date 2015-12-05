@@ -233,8 +233,8 @@ public class WQInference extends AbstractInference<Tripartition> {
 						
 				System.err.println(quadm +
 						" ["+cluster.getBitSet().toString2()+"|"+cluster.complementaryCluster().getBitSet().toString2()+"] : "+post_m);
-				System.err.println(quad2+" : "+post_a1);
-				System.err.println(quad3+" : "+post_a2);
+				//System.err.println(quad2+" : "+post_a1);
+				//System.err.println(quad3+" : "+post_a2);
 			}
 		}
 		int i = 0;
