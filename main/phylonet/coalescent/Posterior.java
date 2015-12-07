@@ -1,19 +1,16 @@
 package phylonet.coalescent;
 import cern.jet.stat.*;
 import cern.jet.math.*;
-
 public class Posterior {
 	private double m1;
 	private double m2;
 	private double m3;
 	private double n;
 	private double posterior;
-	public Posterior(){
-	}
 	public Posterior(double ft1, double ft2, double ft3, double nt){
 	 	m1 = ft1*nt/(ft1+ft2+ft3);
 		m2 = ft2*nt/(ft1+ft2+ft3);
-		m3 = ft3*nt/(ft1+ft2+ft3);;
+		m3 = ft3*nt/(ft1+ft2+ft3);
 		n  = nt;
 		posterior=post();
 	}
@@ -47,6 +44,5 @@ public class Posterior {
 		posterior = g;
 		return posterior;
 	}
-      	
+
 }
->>>>>>> 67b311567858da8c8f1737dd2abe4447fdcf9096

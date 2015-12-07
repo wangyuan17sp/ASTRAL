@@ -230,9 +230,17 @@ public class WQInference extends AbstractInference<Tripartition> {
 				double post_a1 = pst_tmp.getPost();
 				//pst_tmp =  new Posterior((double)a2,(double)p,(double)a1,(double)numTrees);
 				double post_a2 = 1.0 - post_a1 - post_m;
-						
+				int n1 = cluster.getBitSet().nextSetBit(0);
+				int n2 = cluster.complementaryCluster().getBitSet().nextSetBit(0);
+				if (n1<n2){
 				System.err.println(quadm +
 						" ["+cluster.getBitSet().toString2()+"|"+cluster.complementaryCluster().getBitSet().toString2()+"] : "+post_m);
+				}
+				else{
+					System.err.println(quadm +
+							" ["+cluster.complementaryCluster().getBitSet().toString2()+"|"
+							+cluster.getBitSet().toString2()+"] : "+post_m);
+				}
 				//System.err.println(quad2+" : "+post_a1);
 				//System.err.println(quad3+" : "+post_a2);
 			}
