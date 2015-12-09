@@ -2,11 +2,44 @@
 import sys
 import os
 from optparse import OptionParser
-import numpy as np
 import itertools
 import random
-import subprocess
 import re
+def checkBranchIfAvail(g,sp):
+	
+	poolSpeciesBranches = dict()
+
+	branches = dict()
+	f = open(sp, 'r')
+	for x in f:
+		y = re.search('^\{[0-9]',x)
+		if y:
+			bpInfo=re.sub('.*\[','[',x)
+			bpInfo=re.sub('[\[\]{} ]','',bpInfo)
+			bpInfo=re.sub(':.*','',bpInfo)
+			bpInfo=re.sub("\n","",bpInfo)
+			poolSpeciesBranches[bpInfo] = 1;
+	f.close()
+	print len(poolSpeciesBranches)
+	ct = 0;
+	branchList = list()
+	for line in g:
+		y = re.search(':',line)
+		if y:
+			qtInfo=re.sub('\[.*','',line)
+			qtInfo=re.sub(' ','',qtInfo)
+			bpInfo=re.sub('.*\[','[',line)
+			bpInfo=re.sub('[\[\]{} ]','',bpInfo)
+			bpInfo=re.sub(':.*','',bpInfo)	
+			pp     = re.sub('.*:','',line)
+			if bpInfo in poolSpeciesBranches:
+				branchList.append(str(1)+" "+str(pp) +" "+ str(ct/3)+" "+str(ct%3));
+				ct += 1
+			else:
+				branchList.append(str(0)+" "+str(pp) + " "+str(ct/3)+" "+str(ct%3));
+				ct += 1;
+
+	return branchList;
 if __name__ == '__main__':
 	usage = "usage: %prog [options]"
 	parser = OptionParser(usage)
@@ -49,6 +82,7 @@ if __name__ == '__main__':
 			bpInfo=re.sub('.*\[','[',line)
 			bpInfo=re.sub('[\[\]{} ]','',bpInfo)
 			bpInfo=re.sub(':.*','',bpInfo)
+			print bpInfo.replace("\n","")
 			pp     = re.sub('.*:','',line)
 			if bpInfo in poolSpeciesBranches:
 				branchList.append(str(1)+" "+str(pp) +" "+ str(ct/3)+" "+str(ct%3));

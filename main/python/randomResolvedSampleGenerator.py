@@ -7,6 +7,7 @@ import itertools
 import random
 import subprocess
 import dendropy
+
 if __name__ == '__main__':
 	usage = "usage: %prog [options]"
 	parser = OptionParser(usage)
@@ -41,7 +42,7 @@ if __name__ == '__main__':
 		con_tree = trees.consensus(min_freq=float(th))
 		for i in range(0,num):
 			tree_tmp = con_tree.clone(2)
-			tree_tmp.resolve_polytomies(limit=2, update_bipartitions=False, rng=random)
+			tree_tmp.resolve_polytomies(limit=2, update_bipartitions=False, rng=random.seed())
 			treelist.append(tree_tmp)
 
 

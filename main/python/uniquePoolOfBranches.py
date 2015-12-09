@@ -7,6 +7,26 @@ import itertools
 import random
 import subprocess
 import re
+def uniquePoolOfBranches(inpt):
+	poolBranches = dict()
+        listPoolBranches = list()
+        f = open(inpt, 'r')
+        for x in f:
+                y = re.search('^\{[0-9]',x)
+                if y:
+                        qtInfo=re.sub('\[.*','',x)
+                        qtInfo=re.sub(' ','',qtInfo)
+                        qtInfo= re.sub("\n","",qtInfo)
+                        if qtInfo in poolBranches:
+                                continue
+                        else:
+                                bpInfo=re.sub('.*\[','[',x)
+                                bpInfo=re.sub('[\[\]{} ]','',bpInfo)
+                                poolBranches[qtInfo] = 1
+                                y = x.replace("\n","")
+                                listPoolBranches.append(y)
+        f.close()
+	return listPoolBranches
 if __name__ == '__main__':
 	usage = "usage: %prog [options]"
 	parser = OptionParser(usage)
