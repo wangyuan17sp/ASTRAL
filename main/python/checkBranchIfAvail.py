@@ -37,20 +37,27 @@ if __name__ == '__main__':
 			bpInfo=re.sub(':.*','',bpInfo)
 			poolSpeciesBranches[bpInfo] = 1;
 	f.close()
+	print len(poolSpeciesBranches)
 	g = open(inpt,'r')
+	ct = 0;
+	branchList = list()
 	for line in g:
 		y = re.search(':',line)
 		if y:
-			bpInfo = re.sub(':.*','',line)
+			qtInfo=re.sub('\[.*','',line)
+			qtInfo=re.sub(' ','',qtInfo)
+			bpInfo=re.sub('.*\[','[',line)
+			bpInfo=re.sub('[\[\]{} ]','',bpInfo)
+			bpInfo=re.sub(':.*','',bpInfo)
 			pp     = re.sub('.*:','',line)
 			if bpInfo in poolSpeciesBranches:
-				branches[bpInfo] = str(1)+" "+str(pp)
+				branchList.append(str(1)+" "+str(pp) +" "+ str(ct/3)+" "+str(ct%3));
+				ct += 1
 			else:
-				branches[bpInfo] = str(0)+" "+str(pp)
+				branchList.append(str(0)+" "+str(pp) + " "+str(ct/3)+" "+str(ct%3));
+				ct += 1;
 	g.close()
 	f = open(outpath+"/ppOfBranches.txt",'w')
-	f.close()
-	f = open(outpath+"/ppOfBranches.txt",'w')
-	for key in branches:
-		print >> f,branches[key].replace("\n","")
+	for item in branchList:
+		print >> f,item.replace("\n","")
 	f.close()

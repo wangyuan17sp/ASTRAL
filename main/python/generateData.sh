@@ -49,14 +49,14 @@ while getopts "hg:t:n:o:s:" opt; do
 		;;
 	esac
 done
-rm $out/*
-python $DIR/randomResolvedSampleGenerator.py -g $gt -o $out -t $t -n $n
+#rm $out/*
+python $DIR/randomResolvedSampleGenerator.py -g $gt -o $out -t 0.5,0.2,0.333,0.01 -n $n
 for x in `cat $out/random_resolved_trees.nwk`; do
 	y=$(echo $x | sed -e 's/\[&U\]//g')
 	tmp=`mktemp`
 	echo $y>$tmp
 	echo $y>>$out/tmp
-	java -jar $WS_HOME/ASTRAL/astral.4.9.1.jar -i $gt -q $tmp -t 2 >> $out/randomly_resolved_tree.nwk 2>>$out/randomly_resolved_trees.stat.txt;
+	java -jar $WS_HOME/ASTRAL/astral.4.9.1.jar -i $gt -q $tmp -t 4 >> $out/randomly_resolved_tree.nwk 2>>$out/randomly_resolved_trees.stat.txt;
 	rm $tmp
 done
 java -jar $WS_HOME/ASTRAL/astral.4.9.1.jar -i $s -q $s -t 2 >> $out/sp.nwk 2>>$out/sp.stat.txt;

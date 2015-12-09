@@ -14,7 +14,7 @@ if __name__ == '__main__':
 			help="read genetrees from FILENAME")
 	parser.add_option("-o","--output",dest="out",type="string",
 			help="the PATH to write the generated files")
-	parser.add_option("-t","--threshold",dest="thr",type=float,
+	parser.add_option("-t","--threshold",dest="thr",type="string",
 			help="the minimum frequency that consensus will use. Default is 0.2",default=0.2)
 	parser.add_option("-v","--verbose",dest="verbose",
 			help="Verbose",default=1)
@@ -23,7 +23,9 @@ if __name__ == '__main__':
 	(options,args) = parser.parse_args()
 	gt = options.gt
 	outpath = options.out
-	thr = options.thr
+	thrt = options.thr
+	thr = thrt.split(",")
+	print thr
 	verbose=options.verbose
 	num=options.num
 	if ( not options.gt  or not options.out):
@@ -32,13 +34,15 @@ if __name__ == '__main__':
 	src_fpath = os.path.expanduser(os.path.expandvars(gt))
 
 	trees = dendropy.TreeList.get_from_path(src_fpath, 'newick',rooting='force-unrooted')
-
-	con_tree = trees.consensus(min_freq=thr)
+	
 	treelist = dendropy.TreeList()
-	for i in range(0,num):
-		tree_tmp = con_tree.clone(2)
-		tree_tmp.resolve_polytomies(limit=2, update_bipartitions=False, rng=random)
-		treelist.append(tree_tmp)
+	for th in thr:
+		print th
+		con_tree = trees.consensus(min_freq=float(th))
+		for i in range(0,num):
+			tree_tmp = con_tree.clone(2)
+			tree_tmp.resolve_polytomies(limit=2, update_bipartitions=False, rng=random)
+			treelist.append(tree_tmp)
 
 
 	treelist.write(path=outpath+"/random_resolved_trees.nwk", schema="newick")

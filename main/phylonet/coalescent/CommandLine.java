@@ -108,7 +108,9 @@ public class CommandLine {
                             + "0: no annotations. "
                             + "1: only quartet support for main resolution. "
                             + "2: full annotation (quartet support, quartet frequency, and posterior probability for all three alternatives, plus total number of quartets around the branch)."
-                            + "3 (default): only posterior probability"),	
+                            + "3 (default): only posterior probability"
+                            + "4: full annotation (quartet support, quartet frequency, branch clusters, and posterior probability for all three alternatives, plus total number of quartets around the branch). "),
+                            
                             
                     new FlaggedOption("bootstraps", 
                             FileStringParser.getParser().setMustExist(true), null, JSAP.NOT_REQUIRED,

@@ -30,12 +30,15 @@ if __name__ == '__main__':
 		if y:
 			qtInfo=re.sub('\[.*','',x)
 			qtInfo=re.sub(' ','',qtInfo)
+			qtInfo= re.sub("\n","",qtInfo)
 			if qtInfo in poolBranches:
 				continue
 			else:
 				bpInfo=re.sub('.*\[','[',x)
 				bpInfo=re.sub('[\[\]{} ]','',bpInfo)
-				listPoolBranches.append(bpInfo)
+				poolBranches[qtInfo] = 1
+				y = x.replace("\n","")
+				listPoolBranches.append(y)
 	f.close()
 	g = open(outpath+'/poolOfBranches.txt','w')
 	g.close()

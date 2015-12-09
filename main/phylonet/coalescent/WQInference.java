@@ -241,6 +241,42 @@ public class WQInference extends AbstractInference<Tripartition> {
 							" ["+cluster.complementaryCluster().getBitSet().toString2()+"|"
 							+cluster.getBitSet().toString2()+"] : "+post_m);
 				}
+				if (this.getBranchAnnotation() == 4){
+				BitSet tp2 = new BitSet();
+				tp2 = (BitSet)c1.getBitSet().clone();
+				tp2.or(sister.getBitSet());
+				BitSet tp2c = new BitSet();
+				tp2c = (BitSet)tp2.clone();
+				BitSet tp3 = new BitSet();
+				tp3 = (BitSet)c1.getBitSet().clone();
+				tp3.or(remaining.getBitSet());
+				BitSet tp3c = new BitSet();
+				tp3c = (BitSet)tp3.get(0,tp3.length()).clone();
+				tp3c.flip(0,tp3c.length());
+				tp2c.flip(0,tp2c.length());
+				n1 = tp2.nextSetBit(0);
+				n2 = tp2c.nextSetBit(0);
+				if (n1 < n2){
+					System.err.println(quad2 +
+							" ["+tp2.toString2()+"|"+tp2c.toString2()+"] : "+post_a1);
+				}
+				else{
+					System.err.println(quad2 +
+							" ["+tp2c.toString2()+"|"+tp2.toString2()+"] : "+post_a1);
+					
+				}
+				n1 = tp3.nextSetBit(0);
+				n2 = tp3c.nextSetBit(0);
+				if (n1 < n2){
+					System.err.println(quad3 +
+							" ["+tp3.toString2()+"|"+tp3c.toString2()+"] : "+post_a2);
+				}
+				else{
+					System.err.println(quad3 +
+							" ["+tp3c.toString2()+"|"+tp3.toString2()+"] : "+post_a2);
+					
+				}
+				}
 				//System.err.println(quad2+" : "+post_a1);
 				//System.err.println(quad3+" : "+post_a2);
 			}
@@ -277,6 +313,16 @@ public class WQInference extends AbstractInference<Tripartition> {
 					if (this.getBranchAnnotation() == 3) {
 						node.setData(post_m);
 					} else if (this.getBranchAnnotation() == 2) {
+						pst_tmp = new Posterior((double)a1,(double)p,(double)a2,(double)effni);
+						double post_a1 = pst_tmp.getPost();
+						//pst_tmp =  new Posterior((double)a2,(double)p,(double)a1,(double)numTrees);
+						double post_a2 = 1.0 - post_a1 - post_m;
+						
+						node.setData("[q1="+(p+.0)/sum+";q2="+(a1+.0)/sum+";q3="+(a2+.0)/sum+
+									 ";f1="+p+";f2="+a1+";f3="+a2+
+									 ";pp1="+post_m+";pp2="+post_a1+";pp3="+post_a2+
+									 ";QC="+quarc+"]");
+					}  else if (this.getBranchAnnotation() == 4) {
 						pst_tmp = new Posterior((double)a1,(double)p,(double)a2,(double)effni);
 						double post_a1 = pst_tmp.getPost();
 						//pst_tmp =  new Posterior((double)a2,(double)p,(double)a1,(double)numTrees);
