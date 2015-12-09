@@ -50,22 +50,32 @@ while getopts "hg:t:n:o:s:" opt; do
 	esac
 done
 #rm $out/*
-python $DIR/randomResolvedSampleGenerator.py -g $gt -o $out -t 0.5,0.2,0.333,0.01 -n $n
-mainTmpStat=`mktemp`;
-mainTmpTree=`mktemp`;
+
+TmpFolder=`mktemp -d`;
+outTree=`mktemp -p $TmpFolder random_resolved_tree.nwk.XXXXX`
+
+python $DIR/randomResolvedSampleGenerator.py -g $gt -o $outTree -t 0.5,0.2,0.333,0.01 -n $n
+mainTmpStat=`mktemp -p $TmpFolder randomTreesStat.XXXXX`;
+mainTmpTree=`mktemp -p $TmpFolder randomTreesPP.XXXXX`;
 tmp=`mktemp`;
-for x in `cat $out/random_resolved_trees.nwk`; do
+poolOfTrees=`mktemp -p $TmpFolder randomresolvedTrees.XXXXX`;
+for x in `cat $outTree`; do
 	y=$(echo $x | sed -e 's/\[&U\]//g')
 	echo $y>$tmp
-	echo $y>>$out/tmp
+	echo $y>>$poolOfTrees
 	java -Xmx2000M -jar $WS_HOME/ASTRAL/astral.4.9.1.jar -i $gt -q $tmp -t 4 >> $mainTmpTree 2>> $mainTmpStat;
 done
-TmpSpStat=`mktemp`;
-TmpSpTree=`mktemp`;
+TmpSpStat=`mktemp -p $TmpFolder spTreeStat.XXXXX`;
+TmpSpTree=`mktemp -p $TmpFolder spTreePP.XXXXX`;
 java -jar $WS_HOME/ASTRAL/astral.4.9.1.jar -i $s -q $s -t 2 >> $TmpSpTree 2>>$TmpSpStat;
-$DIR/uniquePoolOfBranches.py -i $mainTmpStat -o $out;
-$DIR/checkBranchIfAvail.py -i $out/poolOfBranches.txt -o $out -s $TmpSpStat;
-cat $out/tmp 	> $out/random_resolved_trees.nwk
-rm $out/tmp
-echo $mainTmpStat
-echo $TmpSpStat
+res=`mktemp -p $TmpFolder ppOfBranches.XXXXX`;
+$DIR/extractPPofPoolOfBranches.py -i $mainTmpStat -s $TmpSpStat -o $res
+#$DIR/uniquePoolOfBranches.py -i $mainTmpStat -o $out;
+#$DIR/checkBranchIfAvail.py -i $out/poolOfBranches.txt -o $out -s $TmpSpStat;
+tar czvf $out/astral-PP.tar.gz $TmpFolder
+
+rm $mainTmpStat
+rm $TmpSpStat
+rm $mainTmpTree
+rm $TmpSpTree
+rm $poolOfTrees

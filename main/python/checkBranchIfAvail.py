@@ -30,7 +30,7 @@ def checkBranchIfAvail(g,sp):
 			qtInfo=re.sub(' ','',qtInfo)
 			bpInfo=re.sub('.*\[','[',line)
 			bpInfo=re.sub('[\[\]{} ]','',bpInfo)
-			bpInfo=re.sub(':.*','',bpInfo)	
+			bpInfo=re.sub(':.*','',bpInfo)
 			pp     = re.sub('.*:','',line)
 			if bpInfo in poolSpeciesBranches:
 				branchList.append(str(1)+" "+str(pp) +" "+ str(ct/3)+" "+str(ct%3));
@@ -82,7 +82,6 @@ if __name__ == '__main__':
 			bpInfo=re.sub('.*\[','[',line)
 			bpInfo=re.sub('[\[\]{} ]','',bpInfo)
 			bpInfo=re.sub(':.*','',bpInfo)
-			print bpInfo.replace("\n","")
 			pp     = re.sub('.*:','',line)
 			if bpInfo in poolSpeciesBranches:
 				branchList.append(str(1)+" "+str(pp) +" "+ str(ct/3)+" "+str(ct%3));

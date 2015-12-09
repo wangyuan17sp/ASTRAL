@@ -46,4 +46,4 @@ if __name__ == '__main__':
 			treelist.append(tree_tmp)
 
 
-	treelist.write(path=outpath+"/random_resolved_trees.nwk", schema="newick")
+	treelist.write(path=outpath, schema="newick")
