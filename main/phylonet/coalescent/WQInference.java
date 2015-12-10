@@ -234,12 +234,14 @@ public class WQInference extends AbstractInference<Tripartition> {
 				int n2 = cluster.complementaryCluster().getBitSet().nextSetBit(0);
 				if (n1<n2){
 				System.err.println(quadm +
-						" ["+cluster.getBitSet().toString2()+"|"+cluster.complementaryCluster().getBitSet().toString2()+"] : "+post_m);
+						" ["+cluster.getBitSet().toString2()+"|"+cluster.complementaryCluster().getBitSet().toString2()+"] : "+post_m+" ** f1 = "+p+
+						" f2 = "+a1+" f3 = "+a2+" effective_n = "+ (double)s.effn+" **");
 				}
 				else{
 					System.err.println(quadm +
 							" ["+cluster.complementaryCluster().getBitSet().toString2()+"|"
-							+cluster.getBitSet().toString2()+"] : "+post_m);
+							+cluster.getBitSet().toString2()+"] : "+post_m+" ** f1 = "+p+
+							" f2 = "+a1+" f3 = "+a2+" effective_n = "+ (double)s.effn+" **");
 				}
 				if (this.getBranchAnnotation() == 4){
 					STITreeCluster tp2 = new STITreeCluster();
@@ -255,22 +257,26 @@ public class WQInference extends AbstractInference<Tripartition> {
 					n2 = tp2.complementaryCluster().getBitSet().nextSetBit(0);
 					if (n1 < n2){
 						System.err.println(quad2 +
-								" ["+tp2.getBitSet().toString2()+"|"+tp2.complementaryCluster().getBitSet().toString2()+"] : "+post_a1);
+								" ["+tp2.getBitSet().toString2()+"|"+tp2.complementaryCluster().getBitSet().toString2()+"] : "+post_a1+" ** f1 = "+a1+
+								" f2 = "+p+" f3 = "+a2+" effective_n = "+ (double)s.effn+" **");
 					}
 					else{
 						System.err.println(quad2 +
-								" ["+tp2.complementaryCluster().getBitSet().toString2()+"|"+tp2.getBitSet().toString2()+"] : "+post_a1);
+								" ["+tp2.complementaryCluster().getBitSet().toString2()+"|"+tp2.getBitSet().toString2()+"] : "+post_a1+" ** f1 = "+a1+
+								" f2 = "+p+" f3 = "+a2+" effective_n = "+ (double)s.effn+" **");
 					
 					}
 					n1 = tp3.getBitSet().nextSetBit(0);
 					n2 = tp3.complementaryCluster().getBitSet().nextSetBit(0);
 					if (n1 < n2){
 						System.err.println(quad3 +
-								" ["+tp3.getBitSet().toString2()+"|"+tp3.complementaryCluster().getBitSet().toString2()+"] : "+post_a2);
+								" ["+tp3.getBitSet().toString2()+"|"+tp3.complementaryCluster().getBitSet().toString2()+"] : "+post_a2+" ** f1 = "+a2+
+								" f2 = "+p+" f3 = "+a1+" effective_n = "+ (double)s.effn+" **");
 					}
 					else{
 						System.err.println(quad3 +
-								" ["+tp3.complementaryCluster().getBitSet().toString2()+"|"+tp3.getBitSet().toString2()+"] : "+post_a2);
+								" ["+tp3.complementaryCluster().getBitSet().toString2()+"|"+tp3.getBitSet().toString2()+"] : "+post_a2+" ** f1 = "+a2+
+								" f2 = "+p+" f3 = "+a1+" effective_n = "+ (double)s.effn+" **");
 					
 					}
 					}

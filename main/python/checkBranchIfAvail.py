@@ -12,11 +12,11 @@ def checkBranchIfAvail(g,sp):
 	branches = dict()
 	f = open(sp, 'r')
 	for x in f:
-		y = re.search('^\{[0-9]',x)
+		y = re.search('^\{',x)
 		if y:
 			bpInfo=re.sub('.*\[','[',x)
-			bpInfo=re.sub('[\[\]{} ]','',bpInfo)
-			bpInfo=re.sub(':.*','',bpInfo)
+			bpInfo=re.sub('[\[\]{}]','',bpInfo)
+			bpInfo=re.sub(' :.*','',bpInfo)
 			bpInfo=re.sub("\n","",bpInfo)
 			poolSpeciesBranches[bpInfo] = 1;
 	f.close()
@@ -29,8 +29,8 @@ def checkBranchIfAvail(g,sp):
 			qtInfo=re.sub('\[.*','',line)
 			qtInfo=re.sub(' ','',qtInfo)
 			bpInfo=re.sub('.*\[','[',line)
-			bpInfo=re.sub('[\[\]{} ]','',bpInfo)
-			bpInfo=re.sub(':.*','',bpInfo)
+			bpInfo=re.sub('[\[\]{}]','',bpInfo)
+			bpInfo=re.sub(' :.*','',bpInfo)
 			pp     = re.sub('.*:','',line)
 			if bpInfo in poolSpeciesBranches:
 				branchList.append(str(1)+" "+str(pp) +" "+ str(ct/3)+" "+str(ct%3));
@@ -63,11 +63,11 @@ if __name__ == '__main__':
 	branches = dict()
 	f = open(sp, 'r')
 	for x in f:
-		y = re.search('^\{[0-9]',x)
+		y = re.search('^\{',x)
 		if y:
 			bpInfo=re.sub('.*\[','[',x)
-			bpInfo=re.sub('[\[\]{} ]','',bpInfo)
-			bpInfo=re.sub(':.*','',bpInfo)
+			bpInfo=re.sub('[\[\]{}]','',bpInfo)
+			bpInfo=re.sub(' :.*','',bpInfo)
 			poolSpeciesBranches[bpInfo] = 1;
 	f.close()
 	print len(poolSpeciesBranches)
@@ -80,8 +80,8 @@ if __name__ == '__main__':
 			qtInfo=re.sub('\[.*','',line)
 			qtInfo=re.sub(' ','',qtInfo)
 			bpInfo=re.sub('.*\[','[',line)
-			bpInfo=re.sub('[\[\]{} ]','',bpInfo)
-			bpInfo=re.sub(':.*','',bpInfo)
+			bpInfo=re.sub('[\[\]{}]','',bpInfo)
+			bpInfo=re.sub(' :.*','',bpInfo)
 			pp     = re.sub('.*:','',line)
 			if bpInfo in poolSpeciesBranches:
 				branchList.append(str(1)+" "+str(pp) +" "+ str(ct/3)+" "+str(ct%3));

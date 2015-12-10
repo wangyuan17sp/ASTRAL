@@ -12,7 +12,7 @@ def uniquePoolOfBranches(inpt):
         listPoolBranches = list()
         f = open(inpt, 'r')
         for x in f:
-                y = re.search('^\{[0-9]',x)
+                y = re.search('^\{',x)
                 if y:
                         qtInfo=re.sub('\[.*','',x)
                         qtInfo=re.sub(' ','',qtInfo)
@@ -21,7 +21,7 @@ def uniquePoolOfBranches(inpt):
                                 continue
                         else:
                                 bpInfo=re.sub('.*\[','[',x)
-                                bpInfo=re.sub('[\[\]{} ]','',bpInfo)
+                                bpInfo=re.sub('[\[\]{}]','',bpInfo)
                                 poolBranches[qtInfo] = 1
                                 y = x.replace("\n","")
                                 listPoolBranches.append(y)
@@ -45,24 +45,32 @@ if __name__ == '__main__':
 	poolBranches = dict()
 	listPoolBranches = list()
 	f = open(inpt, 'r')
+	n = 0
+	m = 0
+	c = 0
 	for x in f:
-		y = re.search('^\{[0-9]',x)
+		y = re.search('^\{',x)
 		if y:
+			n += 1
 			qtInfo=re.sub('\[.*','',x)
 			qtInfo=re.sub(' ','',qtInfo)
 			qtInfo= re.sub("\n","",qtInfo)
 			if qtInfo in poolBranches:
+				
+				m +=1
 				continue
 			else:
+				c += 1
 				bpInfo=re.sub('.*\[','[',x)
-				bpInfo=re.sub('[\[\]{} ]','',bpInfo)
+				bpInfo=re.sub('[\[\]{}]','',bpInfo)
 				poolBranches[qtInfo] = 1
 				y = x.replace("\n","")
 				listPoolBranches.append(y)
 	f.close()
 	g = open(outpath+'/poolOfBranches.txt','w')
-	g.close()
-	g = open(outpath+'/poolOfBranches.txt','w')
 	for item in listPoolBranches:
 		print>>g, item.replace("\n","")
 	g.close()
+	print m
+	print c
+	print n
