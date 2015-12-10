@@ -242,41 +242,38 @@ public class WQInference extends AbstractInference<Tripartition> {
 							+cluster.getBitSet().toString2()+"] : "+post_m);
 				}
 				if (this.getBranchAnnotation() == 4){
-				BitSet tp2 = new BitSet();
-				tp2 = (BitSet)c1.getBitSet().clone();
-				tp2.or(sister.getBitSet());
-				BitSet tp2c = new BitSet();
-				tp2c = (BitSet)tp2.clone();
-				BitSet tp3 = new BitSet();
-				tp3 = (BitSet)c1.getBitSet().clone();
-				tp3.or(remaining.getBitSet());
-				BitSet tp3c = new BitSet();
-				tp3c = (BitSet)tp3.get(0,tp3.length()).clone();
-				tp3c.flip(0,tp3c.length());
-				tp2c.flip(0,tp2c.length());
-				n1 = tp2.nextSetBit(0);
-				n2 = tp2c.nextSetBit(0);
-				if (n1 < n2){
-					System.err.println(quad2 +
-							" ["+tp2.toString2()+"|"+tp2c.toString2()+"] : "+post_a1);
-				}
-				else{
-					System.err.println(quad2 +
-							" ["+tp2c.toString2()+"|"+tp2.toString2()+"] : "+post_a1);
+					STITreeCluster tp2 = new STITreeCluster();
+					tp2.setCluster((BitSet) c1.getBitSet().clone());
+					STITreeCluster siscluster = new STITreeCluster();
+					siscluster.setCluster((BitSet) sister.getBitSet().clone());
+					tp2 = tp2.merge(siscluster);
+					STITreeCluster tp3 = new STITreeCluster();
+					tp3.setCluster((BitSet) c1.getBitSet().clone());
+					siscluster.setCluster((BitSet) remaining.getBitSet().clone());
+					tp3 = tp3.merge(siscluster);
+					n1 = tp2.getBitSet().nextSetBit(0);
+					n2 = tp2.complementaryCluster().getBitSet().nextSetBit(0);
+					if (n1 < n2){
+						System.err.println(quad2 +
+								" ["+tp2.getBitSet().toString2()+"|"+tp2.complementaryCluster().getBitSet().toString2()+"] : "+post_a1);
+					}
+					else{
+						System.err.println(quad2 +
+								" ["+tp2.complementaryCluster().getBitSet().toString2()+"|"+tp2.getBitSet().toString2()+"] : "+post_a1);
 					
-				}
-				n1 = tp3.nextSetBit(0);
-				n2 = tp3c.nextSetBit(0);
-				if (n1 < n2){
-					System.err.println(quad3 +
-							" ["+tp3.toString2()+"|"+tp3c.toString2()+"] : "+post_a2);
-				}
-				else{
-					System.err.println(quad3 +
-							" ["+tp3c.toString2()+"|"+tp3.toString2()+"] : "+post_a2);
+					}
+					n1 = tp3.getBitSet().nextSetBit(0);
+					n2 = tp3.complementaryCluster().getBitSet().nextSetBit(0);
+					if (n1 < n2){
+						System.err.println(quad3 +
+								" ["+tp3.getBitSet().toString2()+"|"+tp3.complementaryCluster().getBitSet().toString2()+"] : "+post_a2);
+					}
+					else{
+						System.err.println(quad3 +
+								" ["+tp3.complementaryCluster().getBitSet().toString2()+"|"+tp3.getBitSet().toString2()+"] : "+post_a2);
 					
-				}
-				}
+					}
+					}
 				//System.err.println(quad2+" : "+post_a1);
 				//System.err.println(quad3+" : "+post_a2);
 			}
