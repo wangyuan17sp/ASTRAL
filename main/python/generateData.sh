@@ -1,5 +1,6 @@
 #!/bin/bash
 DIR=$( cd "$(dirname "${BASH_SOURCE[0]}" )" && pwd)
+set -x
 show_help() {
 cat << EOF
 USAGE: ${0##*/} [-h] [-g GENETREES] [-t CONSENSUS THRESHOLD] [-n NUMBER OF SAMPLES] [-o OUTPATH] [ -s TRUE SPECIES TREE]
@@ -51,8 +52,8 @@ while getopts "hg:t:n:o:s:" opt; do
 done
 #rm $out/*
 
-astral_200_half=astral-v474-p1-halfresolved.genes200
 astral_1000_half=astral-v474-p1-halfresolved.genes1000 
+astral_200_half=astral-v474-p1-halfresolved.genes200
 astral_50_half=astral-v474-p1-halfresolved.genes50 
 astral_1000_true=astral-v474-p1-truegenetrees.genes1000 
 astral_200_true=astral-v474-p1-truegenetrees.genes200 
@@ -70,18 +71,23 @@ gt=estimatedgenetre.halfresolved
 tgt=truegenetrees
 
 TmpFolder=`mktemp -d`;
-A200half=`mktemp -p $TmpFolder astral_200_half.nwk.XXXXX`;
+
 A1000half=`mktemp -p $TmpFolder astral_1000_half.nwk.XXXXX`;
+A200half=`mktemp -p $TmpFolder astral_200_half.nwk.XXXXX`;
 A50half=`mktemp -p $TmpFolder astral_50_half.nwk.XXXXX`;
+
 A1000true=`mktemp -p $TmpFolder astral_1000_true.nwk.XXXXX`;
 A200true=`mktemp -p $TmpFolder astral_200_true.nwk.XXXXX`;
 A50true=`mktemp -p $TmpFolder astral_50_true.nwk.XXXXX`;
+
 N1000half=`mktemp -p $TmpFolder njst_1000.nwk.XXXXX`;
 N200half=`mktemp -p $TmpFolder njst_200.nwk.XXXXX`;
 N50half=`mktemp -p $TmpFolder njst_50.nwk.XXXXX`;
+
 C1000half=`mktemp -p $TmpFolder concat_1000.nwk.XXXXX`;
 C200half=`mktemp -p $TmpFolder concat_200.nwk.XXXXX`;
 C50half=`mktemp -p $TmpFolder concat_50.nwk.XXXXX`;
+
 echo $TmpFolder
 
 astral_1000_halfStat=`mktemp -p $TmpFolder astral_1000_halfStat.XXXXX`
@@ -114,73 +120,73 @@ head -n 50 $p/$tgt > $tgt50
 head -n 200 $p/$tgt > $tgt200
 
 
-java -Xmx2000M -jar $WS_HOME/ASTRAL/astral.4.9.1.jar -i $p/$gt -q $p/$astral_1000_half -t 4 > $A1000half 2> $astral_1000_halfStat;
-java -Xmx2000M -jar $WS_HOME/ASTRAL/astral.4.9.1.jar -i $p/$gt200 -q $p/$astral_200_half -t 4 > $A200half 2> $astral_200_halfStat;
-java -Xmx2000M -jar $WS_HOME/ASTRAL/astral.4.9.1.jar -i $p/$gt50 -q $p/$astral_50_half -t 4 > $A50half 2> $astral_50_halfStat;
+java -Xmx2000M -jar $WS_HOME/ASTRAL/astral.4.9.1.jar -i $p/$gt -q $p/$astral_1000_half -t 4 > $A1000half  2>$astral_1000_halfStat ;
+java -Xmx2000M -jar $WS_HOME/ASTRAL/astral.4.9.1.jar -i $gt200 -q $p/$astral_200_half -t 4 >   $A200half 2>$astral_200_halfStat ;
+java -Xmx2000M -jar $WS_HOME/ASTRAL/astral.4.9.1.jar -i $gt50 -q $p/$astral_50_half -t 4 > $A50half 2>$astral_50_halfStat ;
 
-java -Xmx2000M -jar $WS_HOME/ASTRAL/astral.4.9.1.jar -i $p/$tgt -q $p/$astral_1000_true -t 4 > $A1000true 2> $astral_1000_trueStat;
-java -Xmx2000M -jar $WS_HOME/ASTRAL/astral.4.9.1.jar -i $p/$tgt200 -q $p/$astral_200_true -t 4 > $A200true 2> $astral_200_trueStat;
-java -Xmx2000M -jar $WS_HOME/ASTRAL/astral.4.9.1.jar -i $p/$tgt50 -q $p/$astral_50_true -t 4 > $A50true 2> $astral_50_trueStat;
+java -Xmx2000M -jar $WS_HOME/ASTRAL/astral.4.9.1.jar -i $p/$tgt -q $p/$astral_1000_true -t 4 > $A1000true 2> $astral_1000_trueStat ;
+java -Xmx2000M -jar $WS_HOME/ASTRAL/astral.4.9.1.jar -i $tgt200 -q $p/$astral_200_true -t 4 > $A200true 2> $astral_200_trueStat ;
+java -Xmx2000M -jar $WS_HOME/ASTRAL/astral.4.9.1.jar -i $tgt50 -q $p/$astral_50_true -t 4 > $A50true 2> $astral_50_trueStat ;
 
-java -Xmx2000M -jar $WS_HOME/ASTRAL/astral.4.9.1.jar -i $p/$gt -q $p/$njst_1000 -t 4 > $N1000half 2> $njst_1000_halfStat;
-java -Xmx2000M -jar $WS_HOME/ASTRAL/astral.4.9.1.jar -i $p/$gt200 -q $p/$njst_200 -t 4 > $N200half 2> $njst_200_halfStat;
-java -Xmx2000M -jar $WS_HOME/ASTRAL/astral.4.9.1.jar -i $p/$gt50 -q $p/$njst_50 -t 4 > $N50half 2> $njst_50_halfStat;
+java -Xmx2000M -jar $WS_HOME/ASTRAL/astral.4.9.1.jar -i $p/$gt -q $p/$njst_1000 -t 4 > $N1000half 2> $njst_1000_halfStat ;
+java -Xmx2000M -jar $WS_HOME/ASTRAL/astral.4.9.1.jar -i $gt200 -q $p/$njst_200 -t 4 > $N200half 2> $njst_200_halfStat ;
+java -Xmx2000M -jar $WS_HOME/ASTRAL/astral.4.9.1.jar -i $gt50 -q $p/$njst_50 -t 4 > $N50half 2> $njst_50_halfStat ;
 
-java -Xmx2000M -jar $WS_HOME/ASTRAL/astral.4.9.1.jar -i $p/$gt -q $p/$concat_1000 -t 4 > $C1000half 2> $concat_1000_halfStat;
-java -Xmx2000M -jar $WS_HOME/ASTRAL/astral.4.9.1.jar -i $p/$gt200 -q $p/$concat_200 -t 4 > $C200half 2> $concat_200_halfStat;
-java -Xmx2000M -jar $WS_HOME/ASTRAL/astral.4.9.1.jar -i $p/$gt50 -q $p/$concat_50 -t 4 > $C50half 2> $concat_50_halfStat;
-
-
+java -Xmx2000M -jar $WS_HOME/ASTRAL/astral.4.9.1.jar -i $p/$gt -q $p/$concat_1000 -t 4 > $C1000half 2> $concat_1000_halfStat ;
+java -Xmx2000M -jar $WS_HOME/ASTRAL/astral.4.9.1.jar -i $gt200 -q $p/$concat_200 -t 4 > $C200half 2> $concat_200_halfStat ;
+java -Xmx2000M -jar $WS_HOME/ASTRAL/astral.4.9.1.jar -i $gt50 -q $p/$concat_50 -t 4 > $C50half 2> $concat_50_halfStat ;
 
 
-A_trueSp200half=`mktemp -p $TmpFolder astral_200_half_sp.nwk.XXXXX`;
-A_trueSp1000half=`mktemp -p $TmpFolder astral_1000_half_sp.nwk.XXXXX`;
-A_trueSp50half=`mktemp -p $TmpFolder astral_50_half_sp.nwk.XXXXX`;
-A_trueSp1000true=`mktemp -p $TmpFolder astral_1000_true_sp.nwk.XXXXX`;
-A_trueSp200true=`mktemp -p $TmpFolder astral_200_true_sp.nwk.XXXXX`;
-A_trueSp50true=`mktemp -p $TmpFolder astral_50_true_sp.nwk.XXXXX`;
-N_trueSp1000half=`mktemp -p $TmpFolder njst_1000_sp.nwk.XXXXX`;
-N_trueSp200half=`mktemp -p $TmpFolder njst_200_sp.nwk.XXXXX`;
-N_trueSp50half=`mktemp -p $TmpFolder njst_50_sp.nwk.XXXXX`;
-C_trueSp1000half=`mktemp -p $TmpFolder concat_1000_sp.nwk.XXXXX`;
-C_trueSp200half=`mktemp -p $TmpFolder concat_200_sp.nwk.XXXXX`;
-C_trueSp50half=`mktemp -p $TmpFolder concat_50_sp.nwk.XXXXX`;
+
+
+#A_trueSp200half=`mktemp -p $TmpFolder astral_200_half_sp.nwk.XXXXX`;
+#A_trueSp1000half=`mktemp -p $TmpFolder astral_1000_half_sp.nwk.XXXXX`;
+#A_trueSp50half=`mktemp -p $TmpFolder astral_50_half_sp.nwk.XXXXX`;
+#A_trueSp1000true=`mktemp -p $TmpFolder astral_1000_true_sp.nwk.XXXXX`;
+#A_trueSp200true=`mktemp -p $TmpFolder astral_200_true_sp.nwk.XXXXX`;
+#A_trueSp50true=`mktemp -p $TmpFolder astral_50_true_sp.nwk.XXXXX`;
+#N_trueSp1000half=`mktemp -p $TmpFolder njst_1000_sp.nwk.XXXXX`;
+#N_trueSp200half=`mktemp -p $TmpFolder njst_200_sp.nwk.XXXXX`;
+#N_trueSp50half=`mktemp -p $TmpFolder njst_50_sp.nwk.XXXXX`;
+#C_trueSp1000half=`mktemp -p $TmpFolder concat_1000_sp.nwk.XXXXX`;
+#C_trueSp200half=`mktemp -p $TmpFolder concat_200_sp.nwk.XXXXX`;
+#C_trueSp50half=`mktemp -p $TmpFolder concat_50_sp.nwk.XXXXX`;
 echo $TmpFolder
 
-astral_1000_half_trueSp_Stat=`mktemp -p $TmpFolder astral_1000_half_sp_Stat.XXXXX`
-astral_200_half_trueSp_Stat=`mktemp -p $TmpFolder astral_200_half_sp_Stat.XXXXX`
-astral_50_half_trueSp_Stat=`mktemp -p $TmpFolder astral_50_half_sp_Stat.XXXXX`
+#astral_1000_half_trueSp_Stat=`mktemp -p $TmpFolder astral_1000_half_sp_Stat.XXXXX`
+#astral_200_half_trueSp_Stat=`mktemp -p $TmpFolder astral_200_half_sp_Stat.XXXXX`
+#astral_50_half_trueSp_Stat=`mktemp -p $TmpFolder astral_50_half_sp_Stat.XXXXX`
 
-astral_1000_true_trueSp_Stat=`mktemp -p $TmpFolder astral_1000_true_sp_Stat.XXXXX`
-astral_200_trueSp_Stat=`mktemp -p $TmpFolder astral_200_true_sp_Stat.XXXXX`
-astral_50_trueSp_Stat=`mktemp -p $TmpFolder astral_50_true_sp_Stat.XXXXX`
+#astral_1000_true_trueSp_Stat=`mktemp -p $TmpFolder astral_1000_true_sp_Stat.XXXXX`
+#astral_200_trueSp_Stat=`mktemp -p $TmpFolder astral_200_true_sp_Stat.XXXXX`
+#astral_50_trueSp_Stat=`mktemp -p $TmpFolder astral_50_true_sp_Stat.XXXXX`
 
-njst_1000_half_trueSp_Stat=`mktemp -p $TmpFolder njst_1000_sp_Stat.XXXXX`
-njst_200_half_trueSp_Stat=`mktemp -p $TmpFolder njst_200_sp_Stat.XXXXX`
-njst_50_half_trueSp_Stat=`mktemp -p $TmpFolder njst_50_sp_Stat.XXXXX`
+#njst_1000_half_trueSp_Stat=`mktemp -p $TmpFolder njst_1000_sp_Stat.XXXXX`
+#njst_200_half_trueSp_Stat=`mktemp -p $TmpFolder njst_200_sp_Stat.XXXXX`
+#njst_50_half_trueSp_Stat=`mktemp -p $TmpFolder njst_50_sp_Stat.XXXXX`
 
-concat_1000_half_trueSp_Stat=`mktemp -p $TmpFolder concat_1000_sp_Stat.XXXXX`
-concat_200_half_trueSp_Stat=`mktemp -p $TmpFolder concat_200_sp_Stat.XXXXX`
-concat_50_half_trueSp_Stat=`mktemp -p $TmpFolder concat_50_sp_Stat.XXXXX`
-
-
-
-java -Xmx2000M -jar $WS_HOME/ASTRAL/astral.4.9.1.jar -i $s -q $A1000half -t 4 > $A_trueSp1000half 2> $astral_1000_half_trueSp_Stat;
-java -Xmx2000M -jar $WS_HOME/ASTRAL/astral.4.9.1.jar -i $s -q $A200half -t 4 > $A_trueSp200half 2> $astral_200_half_trueSp_Stat;
-java -Xmx2000M -jar $WS_HOME/ASTRAL/astral.4.9.1.jar -i $s -q $A50half -t 4 > $A_trueSp50half 2> $astral_50_half_trueSp_Stat;
-
-java -Xmx2000M -jar $WS_HOME/ASTRAL/astral.4.9.1.jar -i $s -q $A1000true -t 4 > $A_trueSp1000true 2> $astral_1000_true_trueSp_Stat;
-java -Xmx2000M -jar $WS_HOME/ASTRAL/astral.4.9.1.jar -i $s -q $A200true -t 4 > $A_trueSp200true 2> $astral_200_trueSp_Stat;
-java -Xmx2000M -jar $WS_HOME/ASTRAL/astral.4.9.1.jar -i $s -q $A50true -t 4 > $A_trueSp50true 2> $astral_50_trueSp_Stat;
-
-java -Xmx2000M -jar $WS_HOME/ASTRAL/astral.4.9.1.jar -i $s -q $N1000half -t 4 > $N_trueSp1000half 2> $njst_1000_half_trueSp_Stat;
-java -Xmx2000M -jar $WS_HOME/ASTRAL/astral.4.9.1.jar -i $s -q $N200half -t 4 > $N_trueSp200half 2> $njst_200_half_trueSp_Stat;
-java -Xmx2000M -jar $WS_HOME/ASTRAL/astral.4.9.1.jar -i $s -q $N50half -t 4 > $N_trueSp50half 2> $njst_50_half_trueSp_Stat;
+#concat_1000_half_trueSp_Stat=`mktemp -p $TmpFolder concat_1000_sp_Stat.XXXXX`
+#concat_200_half_trueSp_Stat=`mktemp -p $TmpFolder concat_200_sp_Stat.XXXXX`
+#concat_50_half_trueSp_Stat=`mktemp -p $TmpFolder concat_50_sp_Stat.XXXXX`
 
 
-java -Xmx2000M -jar $WS_HOME/ASTRAL/astral.4.9.1.jar -i $s -q $C1000half -t 4 > $C_trueSp1000half 2> $concat_1000_half_trueSp_Stat;
-java -Xmx2000M -jar $WS_HOME/ASTRAL/astral.4.9.1.jar -i $s -q $C200half -t 4 > $C_trueSp200half 2> $concat_200_half_trueSp_Stat;
-java -Xmx2000M -jar $WS_HOME/ASTRAL/astral.4.9.1.jar -i $s -q $C50half -t 4 > $C_trueSp50half 2> $concat_50_half_trueSp_Stat;
+
+#java -Xmx2000M -jar $WS_HOME/ASTRAL/astral.4.9.1.jar -i $s -q $A1000half -t 4 > $A_trueSp1000half 2> $astral_1000_half_trueSp_Stat ;
+#java -Xmx2000M -jar $WS_HOME/ASTRAL/astral.4.9.1.jar -i $s -q $A200half -t 4 > $A_trueSp200half 2> $astral_200_half_trueSp_Stat ;
+#java -Xmx2000M -jar $WS_HOME/ASTRAL/astral.4.9.1.jar -i $s -q $A50half -t 4 > $A_trueSp50half 2> $astral_50_half_trueSp_Stat ;
+
+#java -Xmx2000M -jar $WS_HOME/ASTRAL/astral.4.9.1.jar -i $s -q $A1000true -t 4 > $A_trueSp1000true 2> $astral_1000_true_trueSp_Stat ;
+#java -Xmx2000M -jar $WS_HOME/ASTRAL/astral.4.9.1.jar -i $s -q $A200true -t 4 > $A_trueSp200true 2> $astral_200_trueSp_Stat ;
+#java -Xmx2000M -jar $WS_HOME/ASTRAL/astral.4.9.1.jar -i $s -q $A50true -t 4 > $A_trueSp50true 2> $astral_50_trueSp_Stat ;
+
+#java -Xmx2000M -jar $WS_HOME/ASTRAL/astral.4.9.1.jar -i $s -q $N1000half -t 4 > $N_trueSp1000half 2> $njst_1000_half_trueSp_Stat ;
+#java -Xmx2000M -jar $WS_HOME/ASTRAL/astral.4.9.1.jar -i $s -q $N200half -t 4 > $N_trueSp200half 2> $njst_200_half_trueSp_Stat ;
+#java -Xmx2000M -jar $WS_HOME/ASTRAL/astral.4.9.1.jar -i $s -q $N50half -t 4 > $N_trueSp50half 2> $njst_50_half_trueSp_Stat ;
+
+
+#java -Xmx2000M -jar $WS_HOME/ASTRAL/astral.4.9.1.jar -i $s -q $C1000half -t 4 > $C_trueSp1000half 2> $concat_1000_half_trueSp_Stat ;
+#java -Xmx2000M -jar $WS_HOME/ASTRAL/astral.4.9.1.jar -i $s -q $C200half -t 4 > $C_trueSp200half 2> $concat_200_half_trueSp_Stat ;
+#java -Xmx2000M -jar $WS_HOME/ASTRAL/astral.4.9.1.jar -i $s -q $C50half -t 4 > $C_trueSp50half 2> $concat_50_half_trueSp_Stat ;
 
 
 
@@ -211,8 +217,8 @@ res_concat_50_half=`mktemp -p $TmpFolder ppOfBranches_concat_50_half.XXXXX`;
 
 
 $DIR/extractPPofPoolOfBranches.py -i $astral_1000_halfStat -s $TmpSpStat -o $res_astral_1000_half
-$DIR/extractPPofPoolOfBranches.py -i $astral_1000_halfStat -s $TmpSpStat -o $res_astral_200_half
-$DIR/extractPPofPoolOfBranches.py -i $astral_1000_halfStat -s $TmpSpStat -o $res_astral_50_half
+$DIR/extractPPofPoolOfBranches.py -i $astral_200_halfStat -s $TmpSpStat -o $res_astral_200_half
+$DIR/extractPPofPoolOfBranches.py -i $astral_50_halfStat -s $TmpSpStat -o $res_astral_50_half
 
 $DIR/extractPPofPoolOfBranches.py -i $astral_1000_trueStat -s $TmpSpStat -o $res_astral_1000_true
 $DIR/extractPPofPoolOfBranches.py -i $astral_200_trueStat -s $TmpSpStat -o $res_astral_200_true
