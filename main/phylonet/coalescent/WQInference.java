@@ -108,7 +108,8 @@ public class WQInference extends AbstractInference<Tripartition> {
 		//System.out.println(st.toNewickWD());
 		this.scoreBranches(st);
 	}
-
+	
+	
 	
 	public void scoreBranches(Tree st) {
 
@@ -193,7 +194,7 @@ public class WQInference extends AbstractInference<Tripartition> {
 				}
 				Quadrapartition quadm = weightCalculator2.new Quadrapartition
 						(c1,  c2, sister, remaining);
-
+				STBipartition bmain = new STBipartition(cluster, cluster.complementaryCluster());
 				
 				Results s = weightCalculator2.getWeight(quadm);
 				Long p = s.qs;
@@ -203,6 +204,10 @@ public class WQInference extends AbstractInference<Tripartition> {
 				
 				Quadrapartition quad2 = weightCalculator2.new Quadrapartition
 						(c1, sister, c2, remaining);
+				STITreeCluster c1plussis = new STITreeCluster();
+				c1plussis.setCluster((BitSet) c1.getBitSet().clone());
+				c1plussis.getBitSet().or(sister.getBitSet());
+				STBipartition b2 = new STBipartition(c1plussis, c1plussis.complementaryCluster());
 				s = weightCalculator2.getWeight(quad2);
 				Long a1 = s.qs;
 
@@ -210,7 +215,10 @@ public class WQInference extends AbstractInference<Tripartition> {
 				
 				Quadrapartition quad3 = weightCalculator2.new Quadrapartition
 						(c1, remaining, c2, sister);
-
+				STITreeCluster c1plusrem = new STITreeCluster();
+				c1plusrem.setCluster((BitSet) c1.getBitSet().clone());
+				c1plusrem.getBitSet().or(remaining.getBitSet());
+				STBipartition b3 = new STBipartition(c1plusrem, c1plusrem.complementaryCluster());
 				s = weightCalculator2.getWeight(quad3);
 				Long a2 = s.qs;
 				alt2freqs.add(a2);
@@ -229,57 +237,23 @@ public class WQInference extends AbstractInference<Tripartition> {
 
 				double post_a1 = pst_tmp.getPost();
 				//pst_tmp =  new Posterior((double)a2,(double)p,(double)a1,(double)numTrees);
-				double post_a2 = 1.0 - post_a1 - post_m;
-				int n1 = cluster.getBitSet().nextSetBit(0);
-				int n2 = cluster.complementaryCluster().getBitSet().nextSetBit(0);
-				if (n1<n2){
+				double post_a2 = Math.max(0.,1.0 - post_a1 - post_m);
+				
+				
 				System.err.println(quadm +
-						" ["+cluster.getBitSet().toString2()+"|"+cluster.complementaryCluster().getBitSet().toString2()+"] : "+post_m+" ** f1 = "+p+
+						" [" + bmain.toString2() +"] : "+post_m +" ** f1 = "+p+
 						" f2 = "+a1+" f3 = "+a2+" effective_n = "+ (double)s.effn+" **");
-				}
-				else{
-					System.err.println(quadm +
-							" ["+cluster.complementaryCluster().getBitSet().toString2()+"|"
-							+cluster.getBitSet().toString2()+"] : "+post_m+" ** f1 = "+p+
-							" f2 = "+a1+" f3 = "+a2+" effective_n = "+ (double)s.effn+" **");
-				}
+			
 				if (this.getBranchAnnotation() == 4){
-					STITreeCluster tp2 = new STITreeCluster();
-					tp2.setCluster((BitSet) c1.getBitSet().clone());
-					STITreeCluster siscluster = new STITreeCluster();
-					siscluster.setCluster((BitSet) sister.getBitSet().clone());
-					tp2 = tp2.merge(siscluster);
-					STITreeCluster tp3 = new STITreeCluster();
-					tp3.setCluster((BitSet) c1.getBitSet().clone());
-					siscluster.setCluster((BitSet) remaining.getBitSet().clone());
-					tp3 = tp3.merge(siscluster);
-					n1 = tp2.getBitSet().nextSetBit(0);
-					n2 = tp2.complementaryCluster().getBitSet().nextSetBit(0);
-					if (n1 < n2){
-						System.err.println(quad2 +
-								" ["+tp2.getBitSet().toString2()+"|"+tp2.complementaryCluster().getBitSet().toString2()+"] : "+post_a1+" ** f1 = "+a1+
-								" f2 = "+p+" f3 = "+a2+" effective_n = "+ (double)s.effn+" **");
-					}
-					else{
-						System.err.println(quad2 +
-								" ["+tp2.complementaryCluster().getBitSet().toString2()+"|"+tp2.getBitSet().toString2()+"] : "+post_a1+" ** f1 = "+a1+
-								" f2 = "+p+" f3 = "+a2+" effective_n = "+ (double)s.effn+" **");
 					
-					}
-					n1 = tp3.getBitSet().nextSetBit(0);
-					n2 = tp3.complementaryCluster().getBitSet().nextSetBit(0);
-					if (n1 < n2){
+						System.err.println(quad2 +
+								" ["+b2.toString2()+"] : "+post_a1+ " ** f1 = "+a1+
+								" f2 = "+p+" f3 = "+a2+" effective_n = "+ (double)s.effn+" **");
 						System.err.println(quad3 +
-								" ["+tp3.getBitSet().toString2()+"|"+tp3.complementaryCluster().getBitSet().toString2()+"] : "+post_a2+" ** f1 = "+a2+
-								" f2 = "+p+" f3 = "+a1+" effective_n = "+ (double)s.effn+" **");
-					}
-					else{
-						System.err.println(quad3 +
-								" ["+tp3.complementaryCluster().getBitSet().toString2()+"|"+tp3.getBitSet().toString2()+"] : "+post_a2+" ** f1 = "+a2+
+								" ["+b3.toString2()+"] : "+post_a2+ " ** f1 = "+a2+
 								" f2 = "+p+" f3 = "+a1+" effective_n = "+ (double)s.effn+" **");
 					
-					}
-					}
+				}
 				//System.err.println(quad2+" : "+post_a1);
 				//System.err.println(quad3+" : "+post_a2);
 			}

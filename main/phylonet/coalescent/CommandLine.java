@@ -21,6 +21,7 @@ import java.util.Set;
 import java.util.Stack;
 import java.util.TreeSet;
 
+import phylonet.lca.SchieberVishkinLCA;
 import phylonet.tree.io.NewickReader;
 import phylonet.tree.io.ParseException;
 import phylonet.tree.model.MutableTree;
@@ -319,6 +320,9 @@ public class CommandLine {
             e.printStackTrace();
             return;
         } 
+        
+        //SchieberVishkinLCA lca = new SchieberVishkinLCA(stree);
+        //lca.g
         
         if (mainTrees.size() == 0) {
             System.err.println("Empty list of trees. The function exits.");
