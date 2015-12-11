@@ -286,7 +286,7 @@ public class WQInference extends AbstractInference<Tripartition> {
 				} else {
 					Posterior pst_tmp = new Posterior((double)p,(double)a1,(double)a2,(double)effni);
 					double post_m = pst_tmp.getPost();
-					
+					 
 					if (this.getBranchAnnotation() == 3) {
 						node.setData(post_m);
 					} else if (this.getBranchAnnotation() == 2) {

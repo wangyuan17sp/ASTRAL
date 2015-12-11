@@ -58,9 +58,9 @@ astral_1000_true=astral-v474-p1-truegenetrees.genes1000
 astral_200_true=astral-v474-p1-truegenetrees.genes200 
 astral_50_true=astral-v474-p1-truegenetrees.genes50 
 
-concatenated_1000=concatenatedtree.genes1000 
-concatenated_200=concatenatedtree.genes200 
-concatenated_50=concatenatedtree.genes50 
+concat_1000=concatenatedtree.genes1000 
+concat_200=concatenatedtree.genes200 
+concat_50=concatenatedtree.genes50 
 
 njst_1000=njst.halfresolved.genes1000 
 njst_200=njst.halfresolved.genes200 
@@ -79,6 +79,9 @@ A50true=`mktemp -p $TmpFolder astral_50_true.nwk.XXXXX`;
 N1000half=`mktemp -p $TmpFolder njst_1000.nwk.XXXXX`;
 N200half=`mktemp -p $TmpFolder njst_200.nwk.XXXXX`;
 N50half=`mktemp -p $TmpFolder njst_50.nwk.XXXXX`;
+C1000half=`mktemp -p $TmpFolder concat_1000.nwk.XXXXX`;
+C200half=`mktemp -p $TmpFolder concat_200.nwk.XXXXX`;
+C50half=`mktemp -p $TmpFolder concat_50.nwk.XXXXX`;
 echo $TmpFolder
 
 astral_1000_halfStat=`mktemp -p $TmpFolder astral_1000_halfStat.XXXXX`
@@ -92,6 +95,11 @@ astral_50_trueStat=`mktemp -p $TmpFolder astral_50_trueStat.XXXXX`
 njst_1000_halfStat=`mktemp -p $TmpFolder njst_1000Stat.XXXXX`
 njst_200_halfStat=`mktemp -p $TmpFolder njst_200Stat.XXXXX`
 njst_50_halfStat=`mktemp -p $TmpFolder njst_50Stat.XXXXX`
+
+
+concat_1000_halfStat=`mktemp -p $TmpFolder concat_1000Stat.XXXXX`
+concat_200_halfStat=`mktemp -p $TmpFolder concat_200Stat.XXXXX`
+concat_50_halfStat=`mktemp -p $TmpFolder concat_50Stat.XXXXX`
 
 gt200=`mktemp -p $TmpFolder estimated200.XXXXX`
 gt50=`mktemp -p $TmpFolder estimated50.XXXXX`
@@ -118,6 +126,13 @@ java -Xmx2000M -jar $WS_HOME/ASTRAL/astral.4.9.1.jar -i $p/$gt -q $p/$njst_1000 
 java -Xmx2000M -jar $WS_HOME/ASTRAL/astral.4.9.1.jar -i $p/$gt200 -q $p/$njst_200 -t 4 > $N200half 2> $njst_200_halfStat;
 java -Xmx2000M -jar $WS_HOME/ASTRAL/astral.4.9.1.jar -i $p/$gt50 -q $p/$njst_50 -t 4 > $N50half 2> $njst_50_halfStat;
 
+java -Xmx2000M -jar $WS_HOME/ASTRAL/astral.4.9.1.jar -i $p/$gt -q $p/$concat_1000 -t 4 > $C1000half 2> $concat_1000_halfStat;
+java -Xmx2000M -jar $WS_HOME/ASTRAL/astral.4.9.1.jar -i $p/$gt200 -q $p/$concat_200 -t 4 > $C200half 2> $concat_200_halfStat;
+java -Xmx2000M -jar $WS_HOME/ASTRAL/astral.4.9.1.jar -i $p/$gt50 -q $p/$concat_50 -t 4 > $C50half 2> $concat_50_halfStat;
+
+
+
+
 A_trueSp200half=`mktemp -p $TmpFolder astral_200_half_sp.nwk.XXXXX`;
 A_trueSp1000half=`mktemp -p $TmpFolder astral_1000_half_sp.nwk.XXXXX`;
 A_trueSp50half=`mktemp -p $TmpFolder astral_50_half_sp.nwk.XXXXX`;
@@ -127,6 +142,9 @@ A_trueSp50true=`mktemp -p $TmpFolder astral_50_true_sp.nwk.XXXXX`;
 N_trueSp1000half=`mktemp -p $TmpFolder njst_1000_sp.nwk.XXXXX`;
 N_trueSp200half=`mktemp -p $TmpFolder njst_200_sp.nwk.XXXXX`;
 N_trueSp50half=`mktemp -p $TmpFolder njst_50_sp.nwk.XXXXX`;
+C_trueSp1000half=`mktemp -p $TmpFolder concat_1000_sp.nwk.XXXXX`;
+C_trueSp200half=`mktemp -p $TmpFolder concat_200_sp.nwk.XXXXX`;
+C_trueSp50half=`mktemp -p $TmpFolder concat_50_sp.nwk.XXXXX`;
 echo $TmpFolder
 
 astral_1000_half_trueSp_Stat=`mktemp -p $TmpFolder astral_1000_half_sp_Stat.XXXXX`
@@ -141,6 +159,10 @@ njst_1000_half_trueSp_Stat=`mktemp -p $TmpFolder njst_1000_sp_Stat.XXXXX`
 njst_200_half_trueSp_Stat=`mktemp -p $TmpFolder njst_200_sp_Stat.XXXXX`
 njst_50_half_trueSp_Stat=`mktemp -p $TmpFolder njst_50_sp_Stat.XXXXX`
 
+concat_1000_half_trueSp_Stat=`mktemp -p $TmpFolder concat_1000_sp_Stat.XXXXX`
+concat_200_half_trueSp_Stat=`mktemp -p $TmpFolder concat_200_sp_Stat.XXXXX`
+concat_50_half_trueSp_Stat=`mktemp -p $TmpFolder concat_50_sp_Stat.XXXXX`
+
 
 
 java -Xmx2000M -jar $WS_HOME/ASTRAL/astral.4.9.1.jar -i $s -q $A1000half -t 4 > $A_trueSp1000half 2> $astral_1000_half_trueSp_Stat;
@@ -154,6 +176,11 @@ java -Xmx2000M -jar $WS_HOME/ASTRAL/astral.4.9.1.jar -i $s -q $A50true -t 4 > $A
 java -Xmx2000M -jar $WS_HOME/ASTRAL/astral.4.9.1.jar -i $s -q $N1000half -t 4 > $N_trueSp1000half 2> $njst_1000_half_trueSp_Stat;
 java -Xmx2000M -jar $WS_HOME/ASTRAL/astral.4.9.1.jar -i $s -q $N200half -t 4 > $N_trueSp200half 2> $njst_200_half_trueSp_Stat;
 java -Xmx2000M -jar $WS_HOME/ASTRAL/astral.4.9.1.jar -i $s -q $N50half -t 4 > $N_trueSp50half 2> $njst_50_half_trueSp_Stat;
+
+
+java -Xmx2000M -jar $WS_HOME/ASTRAL/astral.4.9.1.jar -i $s -q $C1000half -t 4 > $C_trueSp1000half 2> $concat_1000_half_trueSp_Stat;
+java -Xmx2000M -jar $WS_HOME/ASTRAL/astral.4.9.1.jar -i $s -q $C200half -t 4 > $C_trueSp200half 2> $concat_200_half_trueSp_Stat;
+java -Xmx2000M -jar $WS_HOME/ASTRAL/astral.4.9.1.jar -i $s -q $C50half -t 4 > $C_trueSp50half 2> $concat_50_half_trueSp_Stat;
 
 
 
@@ -178,6 +205,11 @@ res_njst_1000_half=`mktemp -p $TmpFolder ppOfBranches_njst_1000_half.XXXXX`;
 res_njst_200_half=`mktemp -p $TmpFolder ppOfBranches_njst_200_half.XXXXX`;
 res_njst_50_half=`mktemp -p $TmpFolder ppOfBranches_njst_50_half.XXXXX`;
 
+res_concat_1000_half=`mktemp -p $TmpFolder ppOfBranches_concat_1000_half.XXXXX`;
+res_concat_200_half=`mktemp -p $TmpFolder ppOfBranches_concat_200_half.XXXXX`;
+res_concat_50_half=`mktemp -p $TmpFolder ppOfBranches_concat_50_half.XXXXX`;
+
+
 $DIR/extractPPofPoolOfBranches.py -i $astral_1000_halfStat -s $TmpSpStat -o $res_astral_1000_half
 $DIR/extractPPofPoolOfBranches.py -i $astral_1000_halfStat -s $TmpSpStat -o $res_astral_200_half
 $DIR/extractPPofPoolOfBranches.py -i $astral_1000_halfStat -s $TmpSpStat -o $res_astral_50_half
@@ -189,8 +221,14 @@ $DIR/extractPPofPoolOfBranches.py -i $astral_50_trueStat -s $TmpSpStat -o $res_a
 $DIR/extractPPofPoolOfBranches.py -i $njst_1000_halfStat -s $TmpSpStat -o $res_njst_1000_half
 $DIR/extractPPofPoolOfBranches.py -i $njst_200_halfStat -s $TmpSpStat -o $res_njst_200_half
 $DIR/extractPPofPoolOfBranches.py -i $njst_50_halfStat -s $TmpSpStat -o $res_njst_50_half
+
+
+$DIR/extractPPofPoolOfBranches.py -i $concat_1000_halfStat -s $TmpSpStat -o $res_concat_1000_half
+$DIR/extractPPofPoolOfBranches.py -i $concat_200_halfStat -s $TmpSpStat -o $res_concat_200_half
+$DIR/extractPPofPoolOfBranches.py -i $concat_50_halfStat -s $TmpSpStat -o $res_concat_50_half
 echo "pp of branches computed"
 cp $gt $TmpFolder
+cp $tgt $TmpFolder
 tar czvf $out/astral-PP.tar.gz $TmpFolder
 
 rm -r $TmpFolder
