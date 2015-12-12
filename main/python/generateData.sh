@@ -171,22 +171,14 @@ echo $TmpFolder
 
 
 
-#java -Xmx2000M -jar $WS_HOME/ASTRAL/astral.4.9.1.jar -i $s -q $A1000half -t 4 > $A_trueSp1000half 2> $astral_1000_half_trueSp_Stat ;
-#java -Xmx2000M -jar $WS_HOME/ASTRAL/astral.4.9.1.jar -i $s -q $A200half -t 4 > $A_trueSp200half 2> $astral_200_half_trueSp_Stat ;
-#java -Xmx2000M -jar $WS_HOME/ASTRAL/astral.4.9.1.jar -i $s -q $A50half -t 4 > $A_trueSp50half 2> $astral_50_half_trueSp_Stat ;
+java -Xmx2000M -jar $WS_HOME/ASTRAL/astral.4.9.1.jar -q $s -s $p/$gt -t 4 > $A_trueSp1000half 2> $astral_1000_half_trueSp_Stat ;
+java -Xmx2000M -jar $WS_HOME/ASTRAL/astral.4.9.1.jar -q $s -s $gt200 -t 4 > $A_trueSp200half 2> $astral_200_half_trueSp_Stat ;
+java -Xmx2000M -jar $WS_HOME/ASTRAL/astral.4.9.1.jar -q $s -s $gt50 -t 4 > $A_trueSp50half 2> $astral_50_half_trueSp_Stat ;
 
-#java -Xmx2000M -jar $WS_HOME/ASTRAL/astral.4.9.1.jar -i $s -q $A1000true -t 4 > $A_trueSp1000true 2> $astral_1000_true_trueSp_Stat ;
-#java -Xmx2000M -jar $WS_HOME/ASTRAL/astral.4.9.1.jar -i $s -q $A200true -t 4 > $A_trueSp200true 2> $astral_200_trueSp_Stat ;
-#java -Xmx2000M -jar $WS_HOME/ASTRAL/astral.4.9.1.jar -i $s -q $A50true -t 4 > $A_trueSp50true 2> $astral_50_trueSp_Stat ;
+java -Xmx2000M -jar $WS_HOME/ASTRAL/astral.4.9.1.jar -q $s -s $p/$tgt -t 4 > $A_trueSp1000true 2> $astral_1000_true_trueSp_Stat ;
+java -Xmx2000M -jar $WS_HOME/ASTRAL/astral.4.9.1.jar -q $s -s $tgt200 -t 4 > $A_trueSp200true 2> $astral_200_true_trueSp_Stat ;
+java -Xmx2000M -jar $WS_HOME/ASTRAL/astral.4.9.1.jar -q $s -s $tgt50 -t 4 > $A_trueSp50true 2> $astral_50_true_trueSp_Stat ;
 
-#java -Xmx2000M -jar $WS_HOME/ASTRAL/astral.4.9.1.jar -i $s -q $N1000half -t 4 > $N_trueSp1000half 2> $njst_1000_half_trueSp_Stat ;
-#java -Xmx2000M -jar $WS_HOME/ASTRAL/astral.4.9.1.jar -i $s -q $N200half -t 4 > $N_trueSp200half 2> $njst_200_half_trueSp_Stat ;
-#java -Xmx2000M -jar $WS_HOME/ASTRAL/astral.4.9.1.jar -i $s -q $N50half -t 4 > $N_trueSp50half 2> $njst_50_half_trueSp_Stat ;
-
-
-#java -Xmx2000M -jar $WS_HOME/ASTRAL/astral.4.9.1.jar -i $s -q $C1000half -t 4 > $C_trueSp1000half 2> $concat_1000_half_trueSp_Stat ;
-#java -Xmx2000M -jar $WS_HOME/ASTRAL/astral.4.9.1.jar -i $s -q $C200half -t 4 > $C_trueSp200half 2> $concat_200_half_trueSp_Stat ;
-#java -Xmx2000M -jar $WS_HOME/ASTRAL/astral.4.9.1.jar -i $s -q $C50half -t 4 > $C_trueSp50half 2> $concat_50_half_trueSp_Stat ;
 
 
 
@@ -215,6 +207,14 @@ res_concat_1000_half=`mktemp -p $TmpFolder ppOfBranches_concat_1000_half.XXXXX`;
 res_concat_200_half=`mktemp -p $TmpFolder ppOfBranches_concat_200_half.XXXXX`;
 res_concat_50_half=`mktemp -p $TmpFolder ppOfBranches_concat_50_half.XXXXX`;
 
+res_sp_1000_half=`mktemp -p $TmpFolder ppOfBranches_sp_1000_half.XXXXX`;
+res_sp_200_half=`mktemp -p $TmpFolder ppOfBranches_sp_200_half.XXXXX`;
+res_sp_50_half=`mktemp -p $TmpFolder ppOfBranches_sp_50_half.XXXXX`;
+
+res_sp_1000_true=`mktemp -p $TmpFolder ppOfBranches_sp_1000_true.XXXXX`;
+res_sp_200_true=`mktemp -p $TmpFolder ppOfBranches_sp_200_true.XXXXX`;
+res_sp_50_true=`mktemp -p $TmpFolder ppOfBranches_sp_50_true.XXXXX`;
+
 
 $DIR/extractPPofPoolOfBranches.py -i $astral_1000_halfStat -s $TmpSpStat -o $res_astral_1000_half
 $DIR/extractPPofPoolOfBranches.py -i $astral_200_halfStat -s $TmpSpStat -o $res_astral_200_half
@@ -232,6 +232,16 @@ $DIR/extractPPofPoolOfBranches.py -i $njst_50_halfStat -s $TmpSpStat -o $res_njs
 $DIR/extractPPofPoolOfBranches.py -i $concat_1000_halfStat -s $TmpSpStat -o $res_concat_1000_half
 $DIR/extractPPofPoolOfBranches.py -i $concat_200_halfStat -s $TmpSpStat -o $res_concat_200_half
 $DIR/extractPPofPoolOfBranches.py -i $concat_50_halfStat -s $TmpSpStat -o $res_concat_50_half
+
+$DIR/extractPPofPoolOfBranches.py -i $astral_1000_half_trueSp_Stat -s $TmpSpStat -o $res_sp_1000_half
+$DIR/extractPPofPoolOfBranches.py -i $astral_200_half_trueSp_Stat -s $TmpSpStat -o $res_sp_200_half
+$DIR/extractPPofPoolOfBranches.py -i $astral_50_half_trueSp_Stat -s $TmpSpStat -o $res_sp_50_half
+
+$DIR/extractPPofPoolOfBranches.py -i $astral_1000_true_trueSp_Stat -s $TmpSpStat -o $res_sp_1000_true
+$DIR/extractPPofPoolOfBranches.py -i $astral_200_true_trueSp_Stat -s $TmpSpStat -o $res_sp_200_true
+$DIR/extractPPofPoolOfBranches.py -i $astral_50_true_trueSp_Stat -s $TmpSpStat -o $res_sp_50_true
+
+
 echo "pp of branches computed"
 cp $gt $TmpFolder
 cp $tgt $TmpFolder
