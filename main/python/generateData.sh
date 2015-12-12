@@ -139,12 +139,12 @@ java -Xmx2000M -jar $WS_HOME/ASTRAL/astral.4.9.1.jar -i $gt50 -q $p/$concat_50 -
 
 
 
-#A_trueSp200half=`mktemp -p $TmpFolder astral_200_half_sp.nwk.XXXXX`;
-#A_trueSp1000half=`mktemp -p $TmpFolder astral_1000_half_sp.nwk.XXXXX`;
-#A_trueSp50half=`mktemp -p $TmpFolder astral_50_half_sp.nwk.XXXXX`;
-#A_trueSp1000true=`mktemp -p $TmpFolder astral_1000_true_sp.nwk.XXXXX`;
-#A_trueSp200true=`mktemp -p $TmpFolder astral_200_true_sp.nwk.XXXXX`;
-#A_trueSp50true=`mktemp -p $TmpFolder astral_50_true_sp.nwk.XXXXX`;
+A_trueSp200half=`mktemp -p $TmpFolder astral_200_half_sp.nwk.XXXXX`;
+A_trueSp1000half=`mktemp -p $TmpFolder astral_1000_half_sp.nwk.XXXXX`;
+A_trueSp50half=`mktemp -p $TmpFolder astral_50_half_sp.nwk.XXXXX`;
+A_trueSp1000true=`mktemp -p $TmpFolder astral_1000_true_sp.nwk.XXXXX`;
+A_trueSp200true=`mktemp -p $TmpFolder astral_200_true_sp.nwk.XXXXX`;
+A_trueSp50true=`mktemp -p $TmpFolder astral_50_true_sp.nwk.XXXXX`;
 #N_trueSp1000half=`mktemp -p $TmpFolder njst_1000_sp.nwk.XXXXX`;
 #N_trueSp200half=`mktemp -p $TmpFolder njst_200_sp.nwk.XXXXX`;
 #N_trueSp50half=`mktemp -p $TmpFolder njst_50_sp.nwk.XXXXX`;
@@ -152,15 +152,13 @@ java -Xmx2000M -jar $WS_HOME/ASTRAL/astral.4.9.1.jar -i $gt50 -q $p/$concat_50 -
 #C_trueSp200half=`mktemp -p $TmpFolder concat_200_sp.nwk.XXXXX`;
 #C_trueSp50half=`mktemp -p $TmpFolder concat_50_sp.nwk.XXXXX`;
 echo $TmpFolder
+astral_1000_half_trueSp_Stat=`mktemp -p $TmpFolder astral_1000_half_sp_Stat.XXXXX`
+astral_200_half_trueSp_Stat=`mktemp -p $TmpFolder astral_200_half_sp_Stat.XXXXX`
+astral_50_half_trueSp_Stat=`mktemp -p $TmpFolder astral_50_half_sp_Stat.XXXXX`
 
-#astral_1000_half_trueSp_Stat=`mktemp -p $TmpFolder astral_1000_half_sp_Stat.XXXXX`
-#astral_200_half_trueSp_Stat=`mktemp -p $TmpFolder astral_200_half_sp_Stat.XXXXX`
-#astral_50_half_trueSp_Stat=`mktemp -p $TmpFolder astral_50_half_sp_Stat.XXXXX`
-
-#astral_1000_true_trueSp_Stat=`mktemp -p $TmpFolder astral_1000_true_sp_Stat.XXXXX`
-#astral_200_trueSp_Stat=`mktemp -p $TmpFolder astral_200_true_sp_Stat.XXXXX`
-#astral_50_trueSp_Stat=`mktemp -p $TmpFolder astral_50_true_sp_Stat.XXXXX`
-
+astral_1000_true_trueSp_Stat=`mktemp -p $TmpFolder astral_1000_true_sp_Stat.XXXXX`
+astral_200_true_trueSp_Stat=`mktemp -p $TmpFolder astral_200_true_sp_Stat.XXXXX`
+astral_50_true_trueSp_Stat=`mktemp -p $TmpFolder astral_50_true_sp_Stat.XXXXX`
 #njst_1000_half_trueSp_Stat=`mktemp -p $TmpFolder njst_1000_sp_Stat.XXXXX`
 #njst_200_half_trueSp_Stat=`mktemp -p $TmpFolder njst_200_sp_Stat.XXXXX`
 #njst_50_half_trueSp_Stat=`mktemp -p $TmpFolder njst_50_sp_Stat.XXXXX`
@@ -171,13 +169,13 @@ echo $TmpFolder
 
 
 
-java -Xmx2000M -jar $WS_HOME/ASTRAL/astral.4.9.1.jar -q $s -s $p/$gt -t 4 > $A_trueSp1000half 2> $astral_1000_half_trueSp_Stat ;
-java -Xmx2000M -jar $WS_HOME/ASTRAL/astral.4.9.1.jar -q $s -s $gt200 -t 4 > $A_trueSp200half 2> $astral_200_half_trueSp_Stat ;
-java -Xmx2000M -jar $WS_HOME/ASTRAL/astral.4.9.1.jar -q $s -s $gt50 -t 4 > $A_trueSp50half 2> $astral_50_half_trueSp_Stat ;
+java -Xmx2000M -jar $WS_HOME/ASTRAL/astral.4.9.1.jar -q $s -i $p/$gt -t 4 > $A_trueSp1000half 2> $astral_1000_half_trueSp_Stat ;
+java -Xmx2000M -jar $WS_HOME/ASTRAL/astral.4.9.1.jar -q $s -i $gt200 -t 4 > $A_trueSp200half 2> $astral_200_half_trueSp_Stat ;
+java -Xmx2000M -jar $WS_HOME/ASTRAL/astral.4.9.1.jar -q $s -i $gt50  -t 4 > $A_trueSp50half 2> $astral_50_half_trueSp_Stat ;
 
-java -Xmx2000M -jar $WS_HOME/ASTRAL/astral.4.9.1.jar -q $s -s $p/$tgt -t 4 > $A_trueSp1000true 2> $astral_1000_true_trueSp_Stat ;
-java -Xmx2000M -jar $WS_HOME/ASTRAL/astral.4.9.1.jar -q $s -s $tgt200 -t 4 > $A_trueSp200true 2> $astral_200_true_trueSp_Stat ;
-java -Xmx2000M -jar $WS_HOME/ASTRAL/astral.4.9.1.jar -q $s -s $tgt50 -t 4 > $A_trueSp50true 2> $astral_50_true_trueSp_Stat ;
+java -Xmx2000M -jar $WS_HOME/ASTRAL/astral.4.9.1.jar -q $s -i $p/$tgt -t 4 > $A_trueSp1000true 2> $astral_1000_true_trueSp_Stat ;
+java -Xmx2000M -jar $WS_HOME/ASTRAL/astral.4.9.1.jar -q $s -i $tgt200 -t 4 > $A_trueSp200true 2> $astral_200_true_trueSp_Stat ;
+java -Xmx2000M -jar $WS_HOME/ASTRAL/astral.4.9.1.jar -q $s -i $tgt50  -t 4 > $A_trueSp50true 2> $astral_50_true_trueSp_Stat ;
 
 
 
@@ -245,6 +243,6 @@ $DIR/extractPPofPoolOfBranches.py -i $astral_50_true_trueSp_Stat -s $TmpSpStat -
 echo "pp of branches computed"
 cp $gt $TmpFolder
 cp $tgt $TmpFolder
-tar czvf $out/astral-PP.tar.gz $TmpFolder
+tar czvf $out/astral-PP2.tar.gz $TmpFolder
 
 rm -r $TmpFolder
