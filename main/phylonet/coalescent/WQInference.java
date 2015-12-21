@@ -3,6 +3,7 @@ import phylonet.coalescent.BipartitionWeightCalculator.Results;
 import phylonet.coalescent.Posterior;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Stack;
@@ -13,6 +14,7 @@ import phylonet.tree.model.Tree;
 import phylonet.tree.model.sti.STINode;
 import phylonet.tree.model.sti.STITreeCluster;
 import phylonet.tree.model.sti.STITreeCluster.Vertex;
+import phylonet.tree.util.Bipartitions;
 import phylonet.util.BitSet;
 
 public class WQInference extends AbstractInference<Tripartition> {
@@ -113,10 +115,15 @@ public class WQInference extends AbstractInference<Tripartition> {
 	
 	public void scoreBranches(Tree st) {
 
+		HashMap<STBipartition, Integer> BScounts = null;
 		weightCalculator = new BipartitionWeightCalculator(this);
 		
-		BipartitionWeightCalculator weightCalculator2 = (BipartitionWeightCalculator) weightCalculator;
-		WQDataCollection wqDataCollection = (WQDataCollection) this.dataCollection;
+		BipartitionWeightCalculator weightCalculator2 = null;
+		if (this.getBranchAnnotation() == 5){
+			BScounts = scoreBranchBS();
+		} else {
+			weightCalculator2 = (BipartitionWeightCalculator) weightCalculator;
+		}
 		//wqDataCollection.initializeWeightCalculator(this);
 		
 		Stack<STITreeCluster> stack = new Stack<STITreeCluster>();
@@ -192,72 +199,90 @@ public class WQInference extends AbstractInference<Tripartition> {
 				else {
 					remaining = ((STITreeCluster)node.getParent().getData()).complementaryCluster();
 				}
-				Quadrapartition quadm = weightCalculator2.new Quadrapartition
-						(c1,  c2, sister, remaining);
-				STBipartition bmain = new STBipartition(cluster, cluster.complementaryCluster());
 				
-				Results s = weightCalculator2.getWeight(quadm);
-				Long p = s.qs;
-				mainfreqs.add(s.qs);
-				effn.add(s.effn);
-				
-				
-				Quadrapartition quad2 = weightCalculator2.new Quadrapartition
-						(c1, sister, c2, remaining);
 				STITreeCluster c1plussis = new STITreeCluster();
 				c1plussis.setCluster((BitSet) c1.getBitSet().clone());
 				c1plussis.getBitSet().or(sister.getBitSet());
-				STBipartition b2 = new STBipartition(c1plussis, c1plussis.complementaryCluster());
-				s = weightCalculator2.getWeight(quad2);
-				Long a1 = s.qs;
-
-				alt1freqs.add(a1);
-				
-				Quadrapartition quad3 = weightCalculator2.new Quadrapartition
-						(c1, remaining, c2, sister);
 				STITreeCluster c1plusrem = new STITreeCluster();
 				c1plusrem.setCluster((BitSet) c1.getBitSet().clone());
 				c1plusrem.getBitSet().or(remaining.getBitSet());
+				
+				STBipartition bmain = new STBipartition(cluster, cluster.complementaryCluster());
+				STBipartition b2 = new STBipartition(c1plussis, c1plussis.complementaryCluster());
 				STBipartition b3 = new STBipartition(c1plusrem, c1plusrem.complementaryCluster());
-				s = weightCalculator2.getWeight(quad3);
-				Long a2 = s.qs;
-				alt2freqs.add(a2);
 
-
-				
-				quartcount.add( (c1.getClusterSize()+0l)
-						* (c2.getClusterSize()+0l)
-						* (sister.getClusterSize()+0l)
-						* (remaining.getClusterSize()+0l));
-				
-
-				Posterior pst_tmp = new Posterior((double)p,(double)a1,(double)a2,(double)s.effn);
-				double post_m = pst_tmp.getPost();
-				pst_tmp = new Posterior((double)a1,(double)p,(double)a2,(double)s.effn);
-
-				double post_a1 = pst_tmp.getPost();
-				//pst_tmp =  new Posterior((double)a2,(double)p,(double)a1,(double)numTrees);
-				double post_a2 = Math.max(0.,1.0 - post_a1 - post_m);
-				
-				
-				System.err.println(quadm +
-						" [" + bmain.toString2() +"] : "+post_m +" ** f1 = "+p+
-						" f2 = "+a1+" f3 = "+a2+" effective_n = "+ (double)s.effn+" **");
-			
-				if (this.getBranchAnnotation() == 4){
+				if (this.getBranchAnnotation() == 5){
+					int k = this.trees.size();
+					double s1 = 100.0*(BScounts.containsKey(bmain)?BScounts.get(bmain):0)/k;
+					double s2 = 100.0*(BScounts.containsKey(b2)?BScounts.get(b2):0)/k;
+					double s3 = 100.0*(BScounts.containsKey(b3)?BScounts.get(b3):0)/k;
 					
-						System.err.println(quad2 +
-								" ["+b2.toString2()+"] : "+post_a1+ " ** f1 = "+a1+
-								" f2 = "+p+" f3 = "+a2+" effective_n = "+ (double)s.effn+" **");
-						System.err.println(quad3 +
-								" ["+b3.toString2()+"] : "+post_a2+ " ** f1 = "+a2+
-								" f2 = "+p+" f3 = "+a1+" effective_n = "+ (double)s.effn+" **");
+					System.err.println(bmain.toString2()+ " : " +s1 );
+					System.err.println(b2.toString2()+ " : " +s2 );
+					System.err.println(b3.toString2()+ " : " +s3 );
+
+				} else {
+					Quadrapartition quadm = weightCalculator2.new Quadrapartition
+							(c1,  c2, sister, remaining);
+										
+					Results s = weightCalculator2.getWeight(quadm);
+					Long p = s.qs;
+					mainfreqs.add(s.qs);
+					effn.add(s.effn);
 					
+					
+					Quadrapartition quad2 = weightCalculator2.new Quadrapartition
+							(c1, sister, c2, remaining);
+					
+					s = weightCalculator2.getWeight(quad2);
+					Long a1 = s.qs;
+	
+					alt1freqs.add(a1);
+					
+					Quadrapartition quad3 = weightCalculator2.new Quadrapartition
+							(c1, remaining, c2, sister);
+					s = weightCalculator2.getWeight(quad3);
+					Long a2 = s.qs;
+					alt2freqs.add(a2);
+	
+	
+					
+					quartcount.add( (c1.getClusterSize()+0l)
+							* (c2.getClusterSize()+0l)
+							* (sister.getClusterSize()+0l)
+							* (remaining.getClusterSize()+0l));
+					
+	
+					Posterior pst_tmp = new Posterior((double)p,(double)a1,(double)a2,(double)s.effn);
+					double post_m = pst_tmp.getPost();
+					pst_tmp = new Posterior((double)a1,(double)p,(double)a2,(double)s.effn);
+	
+					double post_a1 = pst_tmp.getPost();
+					//pst_tmp =  new Posterior((double)a2,(double)p,(double)a1,(double)numTrees);
+					double post_a2 = Math.max(0.,1.0 - post_a1 - post_m);
+					
+					
+					System.err.println(quadm +
+							" [" + bmain.toString2() +"] : "+post_m +" ** f1 = "+p+
+							" f2 = "+a1+" f3 = "+a2+" effective_n = "+ (double)s.effn+" **");
+				
+					if (this.getBranchAnnotation() == 4){
+						
+							System.err.println(quad2 +
+									" ["+b2.toString2()+"] : "+post_a1+ " ** f1 = "+a1+
+									" f2 = "+p+" f3 = "+a2+" effective_n = "+ (double)s.effn+" **");
+							System.err.println(quad3 +
+									" ["+b3.toString2()+"] : "+post_a2+ " ** f1 = "+a2+
+									" f2 = "+p+" f3 = "+a1+" effective_n = "+ (double)s.effn+" **");
+						
+					}
 				}
 				//System.err.println(quad2+" : "+post_a1);
 				//System.err.println(quad3+" : "+post_a2);
 			}
 		}
+		
+		if (this.getBranchAnnotation() == 5){ return;}
 		int i = 0;
 		for (TNode n: st.postTraverse()) {
 			STINode node = (STINode) n;
@@ -321,6 +346,27 @@ public class WQInference extends AbstractInference<Tripartition> {
 			} 
 		}
 		
+	}
+
+
+	private HashMap<STBipartition, Integer> scoreBranchBS() {
+		 HashMap<STBipartition, Integer> count = new HashMap<STBipartition, Integer>();
+	        for (Tree tree : trees) {
+	            List<STITreeCluster> geneClusters = Utils.getGeneClusters(tree,GlobalMaps.taxonIdentifier);
+	            for (STITreeCluster cluster: geneClusters) {
+
+	            	STBipartition bi = new STBipartition(cluster,cluster.complementaryCluster());
+	                if (count.containsKey(bi)) {
+	                    count.put(bi, count.get(bi) + 1);
+	                    continue;
+	                }
+	                else {
+	                	count.put(bi, 1);
+	                }
+	            }
+	        }
+	        
+		return count;
 	}
 
 
