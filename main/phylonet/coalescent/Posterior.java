@@ -29,9 +29,7 @@ public class Posterior extends cern.jet.math.Constants{
 	public double G(double x, double nt){
 		double g = 1- Gamma.incompleteBeta(x+1,nt-x+1,1./3.);
 		if (g<=MACHEP){
-			if (x/nt<1./3.) { 
-				g = 0.;
-			}		
+			g = 0.;
 		}
 		return g;
 	}
@@ -46,13 +44,13 @@ public class Posterior extends cern.jet.math.Constants{
 			if (m1/n>1./3.) g=1.;
 			else g=0;
 		}
-		if (g == 0){
-			double v1 = G(m1,n)/(G(m1,n)+G(m2,n)*Functions.pow.apply(2.,m2-m1)*Gamma.beta(m2+1,n-m2+1)/Gamma.beta(m1+1,n-m1+1)+G(m3,n)*Functions.pow.apply(2.,m3-m1)*Gamma.beta(m3+1,n-m3+1)/Gamma.beta(m1+1,n-m1+1));
-			if (Double.isNaN(v1)){
-				if (m1/n>1./3.) g=1.;
-				else g=0;
-			}
-		}
+		//if (g == 0){
+		//	double v1 = G(m1,n)/(G(m1,n)+G(m2,n)*Functions.pow.apply(2.,m2-m1)*Gamma.beta(m2+1,n-m2+1)/Gamma.beta(m1+1,n-m1+1)+G(m3,n)*Functions.pow.apply(2.,m3-m1)*Gamma.beta(m3+1,n-m3+1)/Gamma.beta(m1+1,n-m1+1));
+		//	if (Double.isNaN(v1)){
+		//		if (m1/n>1./3.) g=1.;
+		//		else g=0;
+		//	}
+		//}
 		posterior = g;
 		return posterior;
 	}    
