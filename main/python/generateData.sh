@@ -55,17 +55,27 @@ done
 astral_1000_half=astral-v474-p1-halfresolved.genes1000 
 astral_200_half=astral-v474-p1-halfresolved.genes200
 astral_50_half=astral-v474-p1-halfresolved.genes50 
-astral_1000_true=astral-v474-p1-truegenetrees.genes1000 
-astral_200_true=astral-v474-p1-truegenetrees.genes200 
-astral_50_true=astral-v474-p1-truegenetrees.genes50 
+astral_1000_true=astral-v474-p1-halfresolved.genes1000 
+astral_200_true=astral-v474-p1-halfresolved.genes200 
+astral_50_true=astral-v474-p1-halfresolved.genes50 
 
 concat_1000=concatenatedtree.genes1000 
 concat_200=concatenatedtree.genes200 
-concat_50=concatenatedtree.genes50 
+concat_50=concatenatedtree.genes50
+ 
 
 njst_1000=njst.halfresolved.genes1000 
 njst_200=njst.halfresolved.genes200 
 njst_50=njst.halfresolved.genes50
+
+concat_1000_true=concatenatedtree.genes1000
+concat_200_true=concatenatedtree.genes200
+concat_50_true=concatenatedtree.genes50
+
+
+njst_1000_true=njst.halfresolved.genes1000
+njst_200_true=njst.halfresolved.genes200
+njst_50_true=njst.halfresolved.genes50
 
 gt=estimatedgenetre.halfresolved 
 tgt=truegenetrees
@@ -88,6 +98,13 @@ C1000half=`mktemp -p $TmpFolder concat_1000.nwk.XXXXX`;
 C200half=`mktemp -p $TmpFolder concat_200.nwk.XXXXX`;
 C50half=`mktemp -p $TmpFolder concat_50.nwk.XXXXX`;
 
+N1000true=`mktemp -p $TmpFolder njst_1000_true.nwk.XXXXX`;
+N200true=`mktemp -p $TmpFolder njst_200_true.nwk.XXXXX`;
+N50true=`mktemp -p $TmpFolder njst_50_true.nwk.XXXXX`;
+
+C1000true=`mktemp -p $TmpFolder concat_1000_true.nwk.XXXXX`;
+C200true=`mktemp -p $TmpFolder concat_200_true.nwk.XXXXX`;
+C50true=`mktemp -p $TmpFolder concat_50_true.nwk.XXXXX`;
 echo $TmpFolder
 
 astral_1000_halfStat=`mktemp -p $TmpFolder astral_1000_halfStat.XXXXX`
@@ -106,6 +123,17 @@ njst_50_halfStat=`mktemp -p $TmpFolder njst_50Stat.XXXXX`
 concat_1000_halfStat=`mktemp -p $TmpFolder concat_1000Stat.XXXXX`
 concat_200_halfStat=`mktemp -p $TmpFolder concat_200Stat.XXXXX`
 concat_50_halfStat=`mktemp -p $TmpFolder concat_50Stat.XXXXX`
+
+njst_1000_trueStat=`mktemp -p $TmpFolder njst_1000_trueStat.XXXXX`
+njst_200_trueStat=`mktemp -p $TmpFolder njst_200_trueStat.XXXXX`
+njst_50_trueStat=`mktemp -p $TmpFolder njst_50_trueStat.XXXXX`
+
+
+concat_1000_trueStat=`mktemp -p $TmpFolder concat_1000_trueStat.XXXXX`
+concat_200_trueStat=`mktemp -p $TmpFolder concat_200_trueStat.XXXXX`
+concat_50_trueStat=`mktemp -p $TmpFolder concat_50_trueStat.XXXXX`
+
+
 
 gt200=`mktemp -p $TmpFolder estimated200.XXXXX`
 gt50=`mktemp -p $TmpFolder estimated50.XXXXX`
@@ -136,6 +164,14 @@ java -Xmx2000M -jar $WS_HOME/ASTRAL/astral.4.9.1.jar -i $p/$gt -q $p/$concat_100
 java -Xmx2000M -jar $WS_HOME/ASTRAL/astral.4.9.1.jar -i $gt200 -q $p/$concat_200 -t 4 > $C200half 2> $concat_200_halfStat ;
 java -Xmx2000M -jar $WS_HOME/ASTRAL/astral.4.9.1.jar -i $gt50 -q $p/$concat_50 -t 4 > $C50half 2> $concat_50_halfStat ;
 
+
+java -Xmx2000M -jar $WS_HOME/ASTRAL/astral.4.9.1.jar -i $p/$tgt -q $p/$njst_1000_true -t 4 > $N1000true 2> $njst_1000_trueStat ;
+java -Xmx2000M -jar $WS_HOME/ASTRAL/astral.4.9.1.jar -i $tgt200 -q $p/$njst_200_true -t 4 > $N200true 2> $njst_200_trueStat ;
+java -Xmx2000M -jar $WS_HOME/ASTRAL/astral.4.9.1.jar -i $tgt50 -q $p/$njst_50_true -t 4 > $N50true 2> $njst_50_trueStat ;
+
+java -Xmx2000M -jar $WS_HOME/ASTRAL/astral.4.9.1.jar -i $p/$tgt -q $p/$concat_1000_true -t 4 > $C1000true 2> $concat_1000_trueStat ;
+java -Xmx2000M -jar $WS_HOME/ASTRAL/astral.4.9.1.jar -i $tgt200 -q $p/$concat_200_true -t 4 > $C200true 2> $concat_200_trueStat ;
+java -Xmx2000M -jar $WS_HOME/ASTRAL/astral.4.9.1.jar -i $tgt50 -q $p/$concat_50_true -t 4 > $C50true 2> $concat_50_trueStat ;
 
 
 
@@ -213,6 +249,13 @@ res_sp_1000_true=`mktemp -p $TmpFolder ppOfBranches_sp_1000_true.XXXXX`;
 res_sp_200_true=`mktemp -p $TmpFolder ppOfBranches_sp_200_true.XXXXX`;
 res_sp_50_true=`mktemp -p $TmpFolder ppOfBranches_sp_50_true.XXXXX`;
 
+res_njst_1000_true=`mktemp -p $TmpFolder ppOfBranches_njst_1000_true.XXXXX`;
+res_njst_200_true=`mktemp -p $TmpFolder ppOfBranches_njst_200_true.XXXXX`;
+res_njst_50_true=`mktemp -p $TmpFolder ppOfBranches_njst_50_true.XXXXX`;
+
+res_concat_1000_true=`mktemp -p $TmpFolder ppOfBranches_concat_1000_true.XXXXX`;
+res_concat_200_true=`mktemp -p $TmpFolder ppOfBranches_concat_200_true.XXXXX`;
+res_concat_50_true=`mktemp -p $TmpFolder ppOfBranches_concat_50_true.XXXXX`;
 
 $DIR/extractPPofPoolOfBranches.py -i $astral_1000_halfStat -s $TmpSpStat -o $res_astral_1000_half
 $DIR/extractPPofPoolOfBranches.py -i $astral_200_halfStat -s $TmpSpStat -o $res_astral_200_half
@@ -230,6 +273,15 @@ $DIR/extractPPofPoolOfBranches.py -i $njst_50_halfStat -s $TmpSpStat -o $res_njs
 $DIR/extractPPofPoolOfBranches.py -i $concat_1000_halfStat -s $TmpSpStat -o $res_concat_1000_half
 $DIR/extractPPofPoolOfBranches.py -i $concat_200_halfStat -s $TmpSpStat -o $res_concat_200_half
 $DIR/extractPPofPoolOfBranches.py -i $concat_50_halfStat -s $TmpSpStat -o $res_concat_50_half
+
+$DIR/extractPPofPoolOfBranches.py -i $njst_1000_trueStat -s $TmpSpStat -o $res_njst_1000_true
+$DIR/extractPPofPoolOfBranches.py -i $njst_200_trueStat -s $TmpSpStat -o $res_njst_200_true
+$DIR/extractPPofPoolOfBranches.py -i $njst_50_trueStat -s $TmpSpStat -o $res_njst_50_true
+
+
+$DIR/extractPPofPoolOfBranches.py -i $concat_1000_trueStat -s $TmpSpStat -o $res_concat_1000_true
+$DIR/extractPPofPoolOfBranches.py -i $concat_200_trueStat -s $TmpSpStat -o $res_concat_200_true
+$DIR/extractPPofPoolOfBranches.py -i $concat_50_trueStat -s $TmpSpStat -o $res_concat_50_true
 
 $DIR/extractPPofPoolOfBranches.py -i $astral_1000_half_trueSp_Stat -s $TmpSpStat -o $res_sp_1000_half
 $DIR/extractPPofPoolOfBranches.py -i $astral_200_half_trueSp_Stat -s $TmpSpStat -o $res_sp_200_half
