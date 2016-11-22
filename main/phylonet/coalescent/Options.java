@@ -13,17 +13,18 @@ public class Options {
 	private int branchannotation; 
 	private double lambda;
 	private String outputFile;
-	
+
 	//OLD parameters
 	private double DLbdWeigth;
 	private double CS;
 	private double CD;
 	private int depth;
+	private int summerizationMethod;
 
 	public Options(boolean rooted, boolean extrarooted, 
 			boolean exactSolution, boolean duploss, int alg, int addExtra,
 			boolean outputCompletedGenes, boolean outSearch, boolean run,
-			int branchannotation, double lambda, String outputFile, int depth) {
+			int branchannotation, int sumMethod, double lambda, String outputFile, int depth) {
 		this.rooted = rooted;
 		this.extrarooted = extrarooted;
 		this.exactSolution = exactSolution;
@@ -37,6 +38,7 @@ public class Options {
 		this.setLambda(lambda);
 		this.setOutputFile(outputFile);
 		this.depth = depth;
+		this.summerizationMethod = sumMethod;
 	}
 
 	public boolean isRooted() {
@@ -161,5 +163,10 @@ public class Options {
 
 	public void setOutputFile(String outputFile) {
 		this.outputFile = outputFile;
+	}
+
+	public int getSumMethod() {
+		// TODO Auto-generated method stub
+		return this.summerizationMethod;
 	}
 }

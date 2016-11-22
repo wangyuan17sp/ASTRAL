@@ -82,6 +82,12 @@ class BipartitionWeightCalculator extends AbstractWeightCalculator<Tripartition>
         public long maxPossible() {
         	return (this.s0 * this.s1 * this.s2 * this.s3);
         }
+        
+        @Override
+        public boolean equals(Object other) {
+        	Intersects o = (Intersects) other;
+        	return this.s0 == o.s0 && this.s1 == o.s1 && this.s2 == o.s2 && this.s3 == o.s3;
+        }
 	}
 
 	private long allcases(Intersects side1, Intersects side2, Intersects side3) {
@@ -115,10 +121,10 @@ class BipartitionWeightCalculator extends AbstractWeightCalculator<Tripartition>
 	}
 	
 	class Results {
-		double qs;
+		double[] qs;
 		int effn;
 		
-		Results (double q, int n){
+		Results (double[] q, int n){
 			qs = q;
 			effn = n;
 		}
@@ -132,9 +138,9 @@ class BipartitionWeightCalculator extends AbstractWeightCalculator<Tripartition>
 	}
 
 	public Results getWeight(Quadrapartition quad) {
-		long fi = 0l;
+		long [] fi = {0l,0l,0l};
 		long mi = 0l;
-		double weight = 0l;
+		double [] weight = {0.,0.,0.};
 		int effectiven = 0;
 		Intersects  allsides = null;
 		boolean newTree = true;
@@ -165,15 +171,16 @@ class BipartitionWeightCalculator extends AbstractWeightCalculator<Tripartition>
 			}
 			if (gtb == Integer.MIN_VALUE) {
 				if (!cruise) {
-					double efffreq = (fi+0.0)/(2.0*mi);
-					/*if (efffreq != 1 && efffreq != 0)
-						System.err.println(efffreq);*/
-					weight += efffreq;
+					weight[0] += (fi[0]+0.0)/(mi*2.0);
+					weight[1] += (fi[1]+0.0)/(mi*2.0);
+					weight[2] += (fi[2]+0.0)/(mi*2.0);
 				}
 				stack.clear();
 				newTree = true;
 				cruise = false;
-				fi = 0;
+				fi[0] = 0l;
+				fi[1] = 0l;
+				fi[2] = 0l;
 				mi = 0;
 			} else {
 				if (cruise) continue;
@@ -187,7 +194,11 @@ class BipartitionWeightCalculator extends AbstractWeightCalculator<Tripartition>
 					Intersects side3 = new Intersects(allsides);
 					side3.subtract(newSide);
 	
-					fi+= allcases(side1, side2, side3);
+					fi[0]+= allcases(side1, side2, side3);
+					
+					fi[1]+= allcases(swap1(side1), swap1(side2), swap1(side3));
+					
+					fi[2]+= allcases(swap2(side1), swap2(side2), swap2(side3));
 	
 					//geneTreesAsIntersects[n] = newSide;
 				} else {
@@ -230,7 +241,15 @@ class BipartitionWeightCalculator extends AbstractWeightCalculator<Tripartition>
 	                        
 	                        for (int k = j+1; k < children.size(); k++) {
 	                            Intersects side3 = children.get(k);
-	                            fi += allcases(side1,side2,side3);
+	                            fi[0] += allcases(side1,side2,side3);
+	                            
+	        					fi[1] += allcases(swap1(side1), swap1(side2), swap1(side3));
+	        					
+	        					fi[2] += allcases(swap2(side1), swap2(side2), swap2(side3));
+
+
+	        					swap2(side1); swap2(side2); swap2(side3);
+	        					swap1(side1); swap1(side2); swap1(side3);
 	                        }
 	                    }
 	                }
@@ -239,6 +258,22 @@ class BipartitionWeightCalculator extends AbstractWeightCalculator<Tripartition>
 		}
 
 		return  new Results(weight,effectiven);
+	}
+	
+	private Intersects swap1(Intersects in) {
+		long tmp = in.s0;
+		in.s0 = in.s2;
+		in.s2 = tmp;
+		//  return new Intersects(in.s0, in.s2, in.s1, in.s3);
+		return in;
+	}
+
+	private Intersects swap2(Intersects in) {
+		//return new Intersects(in.s0, in.s3, in.s1, in.s2);
+		long tmp = in.s0;
+		in.s0 = in.s3;
+		in.s3 = tmp;
+		return in;
 	}
 	
 /*	private boolean checkFutileCalcs(Intersects side1, Intersects side2) {
@@ -264,15 +299,22 @@ class BipartitionWeightCalculator extends AbstractWeightCalculator<Tripartition>
 		private int _hash = 0;
 
 
-		public Quadrapartition(STITreeCluster c1, STITreeCluster c2, STITreeCluster c3,STITreeCluster c4) {
+		public Quadrapartition(STITreeCluster c1, STITreeCluster c2, STITreeCluster c3,STITreeCluster c4, boolean rotate) {
 
-			initialize(c1, c2, c3, c4);
+			if (rotate)
+				initialize(c1, c2, c3, c4);
+			else {
+                cluster1 = c1;
+                cluster2 = c2;
+                cluster3 = c3;
+                cluster4 = c4;
+			}
 		}
 		
 		private void initialize(STITreeCluster c1, STITreeCluster c2,
                 STITreeCluster c3, STITreeCluster c4) {
-            if (c1 == null || c2 == null || c3 == null) {
-                throw new RuntimeException("none cluster" +c1+" "+c2+" "+c3);
+            if (c1 == null || c2 == null || c3 == null || c4 == null) {
+                throw new RuntimeException("none cluster" + c1 + " " + c2 + " " + c3 + " " + c4);
             }
             int n1 = c1.getBitSet().nextSetBit(0), n2 = c2.getBitSet().nextSetBit(0), 
                     n3 = c3.getBitSet().nextSetBit(0), n4=c4.getBitSet().nextSetBit(0);

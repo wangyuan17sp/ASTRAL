@@ -95,6 +95,17 @@ public class CommandLine {
                     		'j', "depth",
                     		"What is the acceptable distance for clusters to be included around each branch?: 0 (default, original definition), 1 ( The same as original definition, new implementation), 2, etc.\n"
                     		),
+                    		
+                    new FlaggedOption("Localpp summerization method",
+                    		JSAP.INTEGER_PARSER, "0", JSAP.NOT_REQUIRED, JSAP.NO_SHORTFLAG,
+                    		"summerization-method",
+                    		"0: Minimum of LocalPP of all quartets around the branch with distance `depth` from the branch, specified with -j \n"
+                    		+ "1: Minimum of LocalPP of quartets one from each cluster around the branch with distance `depth` from the branch, specified with -j \n"
+                    		+ "2: Minimum of LocalPP of all quartets with above mthods around the branch with distance `depth` from the branch, specified with -j \n"
+                    		+ "3: Average of LocalPP of all quartets around the branch with distance `depth` from the branch, specified with -j \n"
+                    		+ "4: Average of LocalPP of quartets one from each cluster around the branch with distance `depth` from the branch, specified with -j \n"
+                    		+ "5: Average of LocalPP of all quartets with above mthods around the branch with distance `depth` from the branch, specified with -j \n"),
+      
 	                new FlaggedOption("bootstraps", 
 	                        FileStringParser.getParser().setMustExist(true), null, JSAP.NOT_REQUIRED,
 	                        'b', "bootstraps",
@@ -656,6 +667,7 @@ public class CommandLine {
     			keepOptions.contains("searchspace_norun") || keepOptions.contains("searchspace"), 
     			!keepOptions.contains("searchspace_norun"),
     			config.getInt("branch annotation level"), 
+    			config.getInt("summerization-method"),
     			config.getDouble("lambda"),
     			outfileName, config.getInt("branch annotation option"));
     	options.setDLbdWeigth(wh); 
