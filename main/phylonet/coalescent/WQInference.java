@@ -198,7 +198,7 @@ public class WQInference extends AbstractInference<Tripartition> {
 				}
 			}
 			else {
-				scoreBranches2(st, this.getDepth());
+				scoreBranches(st, this.getDepth());
 			}
 		}
 		return (sum/4l+0.)/this.maxpossible;
@@ -389,7 +389,7 @@ public class WQInference extends AbstractInference<Tripartition> {
 			double postQ3 = post.getPost();
 		}
 	}
-	private void scoreBranches2(Tree st, int depth){
+	private void scoreBranches(Tree st, int depth){
 		System.out.println(depth);
 		System.out.println(options.getBranchannotation());
 		weightCalculator = new BipartitionWeightCalculator(this,((WQWeightCalculator)this.weightCalculator).geneTreesAsInts());
@@ -445,6 +445,7 @@ public class WQInference extends AbstractInference<Tripartition> {
 
 			if (node.isLeaf() || node.getParent() == null || node.getParent().getParent() == null
 					|| n.getChildCount() > 2) {
+				node.setData(null);
 				continue;
 			}
 			NodeData d = finalNodeDataList.poll();
@@ -492,10 +493,10 @@ public class WQInference extends AbstractInference<Tripartition> {
 					throw new RuntimeException("Hmm, this shouldn't happen; "+nodeDataList);
 				}
 				if (this.options.getSumMethod() == 0) {
-					summerizedNd = findNDWithMinimumLocalPP(nodeDataList, node );
+					summerizedNd = findNDWithMinimumLocalPP(nodeDataList);
 				}
 				if (this.options.getSumMethod() == 3) {
-					summerizedNd = findNDWithAverageLoalPP(nodeDataList, node);
+					summerizedNd = findNDWithAverageLoalPP(nodeDataList);
 				}
 		}
 		else if (this.options.getSumMethod() == 1 || this.options.getSumMethod() == 4) {
@@ -504,10 +505,10 @@ public class WQInference extends AbstractInference<Tripartition> {
 				throw new RuntimeException("Hmm, this shouldn't happen; "+nodeDataList);
 			}
 			if (this.options.getSumMethod() == 1) {
-				summerizedNd = findNDWithMinimumLocalPP(nodeDataList, node );
+				summerizedNd = findNDWithMinimumLocalPP(nodeDataList);
 			}
 			if (this.options.getSumMethod() == 4) {
-				summerizedNd = findNDWithAverageLoalPP(nodeDataList, node);
+				summerizedNd = findNDWithAverageLoalPP(nodeDataList);
 			}
 		}
 		else if (this.options.getSumMethod() == 2 || this.options.getSumMethod() == 5) { 	
@@ -516,10 +517,10 @@ public class WQInference extends AbstractInference<Tripartition> {
 				throw new RuntimeException("Hmm, this shouldn't happen; "+nodeDataList);
 			}
 			if (this.options.getSumMethod() == 2) {
-				summerizedNd = findNDWithMinimumLocalPP(nodeDataList, node );
+				summerizedNd = findNDWithMinimumLocalPP(nodeDataList);
 			}
 			if (this.options.getSumMethod() == 5) {
-				summerizedNd = findNDWithAverageLoalPP(nodeDataList, node);
+				summerizedNd = findNDWithAverageLoalPP(nodeDataList);
 			}
 		}
 		else {
@@ -550,8 +551,13 @@ public class WQInference extends AbstractInference<Tripartition> {
 		STITreeCluster c1plusrem = new STITreeCluster(belowCl1);
 		c1plusrem.getBitSet().or(remainingCl.getBitSet());
 		STBipartition b3 = new STBipartition(c1plusrem, c1plusrem.complementaryCluster());	
-		STBipartition[] biparts = new STBipartition[] {bmain, b2, b3};					
+		STBipartition[] biparts = new STBipartition[] {bmain, b2, b3};	
+		double bl = summerizedNd.postQ1.branchLength();
+		
+		node.setParentDistance(bl);
 		summerizedNd.bipartitions = biparts;
+		summerizedNd.setString(this.getBranchAnnotation());			
+		System.err.println(summerizedNd.data);
 		
 		return summerizedNd;
 
@@ -560,8 +566,7 @@ public class WQInference extends AbstractInference<Tripartition> {
 	
 	
 
-	private NodeData findNDWithAverageLoalPP(ArrayList<NodeData> nodeDataList,
-			STINode node) {
+	private NodeData findNDWithAverageLoalPP(ArrayList<NodeData> nodeDataList) {
 		NodeData criticalNd= new NodeData();
 		for(NodeData ndI: nodeDataList){
 				if (ndI == null) {
@@ -580,15 +585,11 @@ public class WQInference extends AbstractInference<Tripartition> {
 		criticalNd.alt2freqs /= nodeDataList.size();
 		criticalNd.effn /= nodeDataList.size();
 
-		double bl = criticalNd.postQ1.branchLength();
-		node.setParentDistance(bl);
-		criticalNd.setString(this.getBranchAnnotation());			
-		System.err.println(criticalNd.toString2(this.getBranchAnnotation()));
 		return criticalNd;
 	}
 
 
-	private NodeData findNDWithMinimumLocalPP(ArrayList<NodeData> nodeDataList, STINode node) {
+	private NodeData findNDWithMinimumLocalPP(ArrayList<NodeData> nodeDataList) {
 		double minPostQ1 = Double.MAX_VALUE;
 		double minPostQ2 = Double.MAX_VALUE;
 		double minPostQ3 = Double.MAX_VALUE;
@@ -621,10 +622,7 @@ public class WQInference extends AbstractInference<Tripartition> {
 				}
 
 		} 
-		double bl = criticalNd.postQ1.branchLength();
-		node.setParentDistance(bl);
-		criticalNd.setString(this.getBranchAnnotation());			
-		System.err.println(criticalNd.toString2(this.getBranchAnnotation()));
+
 		return criticalNd;
 	}
 
@@ -770,195 +768,6 @@ public class WQInference extends AbstractInference<Tripartition> {
 	}
 	
 
-	private void scoreBranches(Tree st, int depth){
-		
-		weightCalculator = new BipartitionWeightCalculator(this,((WQWeightCalculator)this.weightCalculator).geneTreesAsInts());
-		
-		BipartitionWeightCalculator weightCalculator2 = (BipartitionWeightCalculator) weightCalculator;
-		WQDataCollection wqDataCollection = (WQDataCollection) this.dataCollection;
-		
-		/**
-		 * Add bitsets to each node for all taxa under it. 
-		 * Bitsets are saved in nodes "data" field
-		 */
-		Stack<STITreeCluster> stack = new Stack<STITreeCluster>();
-		for (TNode n: st.postTraverse()) {
-			STINode node = (STINode) n;
-			if (node.isLeaf()) {
-				String nodeName = node.getName(); //GlobalMaps.TaxonNameMap.getSpeciesName(node.getName());
-
-				STITreeCluster cluster = new STITreeCluster();
-				Integer taxonID = GlobalMaps.taxonIdentifier.taxonId(nodeName);
-				cluster.addLeaf(taxonID);
-
-				stack.add(cluster);
-				node.setData(cluster);
-
-			} else {
-				ArrayList<STITreeCluster> childbslist = new ArrayList<STITreeCluster>();
-				BitSet bs = new BitSet(GlobalMaps.taxonIdentifier.taxonCount());
-				for (TNode child: n.getChildren()) {
-					STITreeCluster pop = stack.pop();
-					childbslist.add(pop);
-					bs.or(pop.getBitSet());
-				}
-				
-				STITreeCluster cluster = new STITreeCluster();
-				cluster.setCluster((BitSet) bs.clone());
-
-				//((STINode)node).setData(new GeneTreeBitset(node.isRoot()? -2: -1));
-				stack.add(cluster);
-				node.setData(cluster);
-			}
-		}
-		
-		stack = new Stack<STITreeCluster>();
-		
-	//	ArrayList<ArrayList<Quadrapartition>> allQuads = new ArrayList<ArrayList<Quadrapartition>>();
-	//	ArrayList<ArrayList<STITreeCluster>> allBelowClusters = new ArrayList<ArrayList<STITreeCluster>>();
-	//	ArrayList<ArrayList<STITreeCluster>> allAboveClusters = new ArrayList<ArrayList<STITreeCluster>>();
-	//	ArrayList<ArrayList<NodeData>> allDataNodes = new ArrayList<ArrayList<NodeData>>();
-		for (TNode n: st.postTraverse()) {
-			ArrayList<NodeData> nodeDataList = new ArrayList<NodeData>();
-			STINode node = (STINode) n;
-			if (skipNode(node)) {
-				continue;
-			} else {
-				/**
-				 * 1. Create quadripartion
-				 */
-				ArrayList<STITreeCluster> belowClusters = listClustersBelowNode(n, depth);
-				ArrayList<STITreeCluster> aboveClusters = listClustersAboveParentNode(n.getParent(), depth);
-				
-//				allBelowClusters.add(belowClusters);
-//				allAboveClusters.add(aboveClusters);
-				NodeData nd = new NodeData();
-				nodeDataList.add(nd);
-				ArrayList<Quadrapartition> quadList = new ArrayList<Quadrapartition>();
-				for (STITreeCluster c1: belowClusters){
-					int ic1 = belowClusters.indexOf(c1);
-					int mb = belowClusters.size();
-					for (STITreeCluster c2: belowClusters.subList(ic1+1,mb)){
-						for (STITreeCluster sister: aboveClusters){
-							int isister = aboveClusters.indexOf(sister);
-							int ma = aboveClusters.size();
-							for (STITreeCluster remaining: aboveClusters.subList(isister+1,ma)){
-								Quadrapartition quad = weightCalculator2.new Quadrapartition
-										(c1,  c2, sister, remaining);
-								if (this.getBranchAnnotation() == 7){
-									if (remaining.getClusterSize() != 0 && sister.getClusterSize() != 0 && c2.getClusterSize() != 0 && c1.getClusterSize() != 0 ){
-										System.err.print(c1.toString()+c2.toString()+"|"+sister.toString()+remaining.toString()+"\n");
-									}
-								}
-								quadList.add(quad);
-								Results s = weightCalculator2.getWeight(quad);
-								nd.mainfreq = s.qs;
-								nd.effn = (double) s.effn + 0.0;
-								STITreeCluster cluster = new STITreeCluster();
-								STITreeCluster c1plussis = new STITreeCluster();
-								STITreeCluster c1plusrem = new STITreeCluster();
-								
-								c1plussis.setCluster((BitSet) c1.getBitSet().clone());
-								c1plussis.getBitSet().or(c2.getBitSet());
-								
-								c1plusrem.setCluster((BitSet) sister.getBitSet().clone());
-								c1plusrem.getBitSet().or(remaining.getBitSet());
-								
-								Quadrapartition[] threequads = new Quadrapartition [] {quad, null,null};
-								
-								quad = weightCalculator2.new Quadrapartition
-										(c1, sister, c2, remaining);
-								s = weightCalculator2.getWeight(quad);
-								nd.alt1freqs=s.qs;
-								threequads[1] = quad;
-								
-								quad = weightCalculator2.new Quadrapartition
-										(c1, remaining, c2, sister);
-								s = weightCalculator2.getWeight(quad);
-								nd.alt2freqs=s.qs;
-								threequads[2] = quad;
-							
-								nd.quartcount= (c1.getClusterSize()+0l)
-										* (c2.getClusterSize()+0l)
-										* (sister.getClusterSize()+0l)
-										* (remaining.getClusterSize()+0l);
-								quadList.add(quad);
-								
-								
-								if (this.getBranchAnnotation() == 6) {
-									
-									c1plussis.setCluster((BitSet) c1.getBitSet().clone());
-									c1plussis.getBitSet().or(sister.getBitSet());
-									
-									c1plusrem.setCluster((BitSet) c1.getBitSet().clone());
-									c1plusrem.getBitSet().or(remaining.getBitSet());
-									
-									STBipartition bmain = new STBipartition(cluster, cluster.complementaryCluster());
-									STBipartition b2 = new STBipartition(c1plussis, c1plussis.complementaryCluster());
-									STBipartition b3 = new STBipartition(c1plusrem, c1plusrem.complementaryCluster());
-					
-									STBipartition[] biparts = new STBipartition[] {bmain, b2, b3};
-									nd.quads = threequads;
-									nd.bipartitions = biparts;
-								}
-								setLocalPP(nd);
-								nodeDataList.add(nd);
-							}
-							double minPost = -1;
-							NodeData criticalNd= new NodeData();
-							for(NodeData ndI: nodeDataList ){
-									if(ndI.post < minPost ){
-											minPost = ndI.post;
-											criticalNd = ndI;
-									}
-							}
-							double bl = criticalNd.postQ1.branchLength();
-							node.setParentDistance(bl);
-							criticalNd.setString(this.getBranchAnnotation());
-							System.err.print(criticalNd.toString2());
-						}
-					}
-				}
-				double minPostQ1 = Double.MAX_VALUE;
-				double minPostQ2 = Double.MAX_VALUE;
-				double minPostQ3 = Double.MAX_VALUE;
-				NodeData criticalNd= new NodeData();
-				for(NodeData ndI: nodeDataList){
-						if (ndI == null) {
-							throw new RuntimeException("Hmm, this shouldn't happen; "+ndI);
-						}
-						if(ndI.postQ1.getPost() < minPostQ1){
-							minPostQ1 = ndI.postQ1.getPost();
-							criticalNd.postQ1 = ndI.postQ1;
-							criticalNd.quads[0] = ndI.quads[0];
-							criticalNd.bipartitions[0] = ndI.bipartitions[0];
-							criticalNd.mainfreq = ndI.mainfreq;
-							criticalNd.effn = ndI.effn;
-						}
-						if(ndI.postQ2.getPost() < minPostQ2){
-							minPostQ2 = ndI.postQ2.getPost();
-							criticalNd.postQ2 = ndI.postQ2;
-							criticalNd.quads[1] = ndI.quads[1];
-							criticalNd.bipartitions[1] = ndI.bipartitions[1];
-							criticalNd.alt1freqs = ndI.alt1freqs;
-						}
-						if(ndI.postQ3.getPost() < minPostQ3){
-							minPostQ3 = ndI.postQ3.getPost();
-							criticalNd.postQ3 = ndI.postQ3;
-							criticalNd.quads[2] = ndI.quads[2];
-							criticalNd.bipartitions[2] = ndI.bipartitions[2];
-							criticalNd.alt2freqs = ndI.alt2freqs;
-						}
-				} 
-				double bl = criticalNd.postQ1.branchLength();
-				node.setParentDistance(bl);
-				criticalNd.setString(this.getBranchAnnotation());
-				System.err.println(criticalNd.toString2());
-			}
-		}
-	}
-	
-	
 	
 	
 	/**
@@ -1063,7 +872,7 @@ public class WQInference extends AbstractInference<Tripartition> {
 					remaining = ((STITreeCluster)node.getParent().getData()).complementaryCluster();
 				}
 				Quadrapartition quad = weightCalculator2.new Quadrapartition
-						(c1,  c2, sister, remaining);
+						(c1,  c2, sister, remaining, true);
 				if (this.getBranchAnnotation() == 7){
 					if (remaining.getClusterSize() != 0 && sister.getClusterSize() != 0 && c2.getClusterSize() != 0 && c1.getClusterSize() != 0 ){
 						System.err.print(c1.toString()+c2.toString()+"|"+sister.toString()+remaining.toString()+"\n");
@@ -1074,7 +883,7 @@ public class WQInference extends AbstractInference<Tripartition> {
 				 * 2. Scores all three quadripartitoins
 				 */
 				Results s = weightCalculator2.getWeight(quad);
-				nd.mainfreq = s.qs;
+				nd.mainfreq = s.qs[0];
 				nd.effn = (double) s.effn + 0.0;
 				
 				
@@ -1088,17 +897,11 @@ public class WQInference extends AbstractInference<Tripartition> {
 				
 				Quadrapartition[] threequads = new Quadrapartition [] {quad, null,null};
 				
-				quad = weightCalculator2.new Quadrapartition
-						(c1, sister, c2, remaining);
 				s = weightCalculator2.getWeight(quad);
-				nd.alt1freqs=s.qs;
-				threequads[1] = quad;
+				nd.alt1freqs=s.qs[1];
 				
-				quad = weightCalculator2.new Quadrapartition
-						(c1, remaining, c2, sister);
 				s = weightCalculator2.getWeight(quad);
-				nd.alt2freqs=s.qs;
-				threequads[2] = quad;
+				nd.alt2freqs=s.qs[2];
 			
 				nd.quartcount= (c1.getClusterSize()+0l)
 						* (c2.getClusterSize()+0l)

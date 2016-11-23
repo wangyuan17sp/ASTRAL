@@ -376,6 +376,7 @@ public class CommandLine {
             GlobalMaps.taxonNameMap = new TaxonNameMap();
         }
         
+
         Options options = newOptions(criterion, rooted, extrarooted, 
         		1.0D, 1.0D, wh, keepOptions, config, outfileName);
         
@@ -667,7 +668,7 @@ public class CommandLine {
     			keepOptions.contains("searchspace_norun") || keepOptions.contains("searchspace"), 
     			!keepOptions.contains("searchspace_norun"),
     			config.getInt("branch annotation level"), 
-    			config.getInt("summerization-method"),
+    			config.getInt("Localpp summerization method"),
     			config.getDouble("lambda"),
     			outfileName, config.getInt("branch annotation option"));
     	options.setDLbdWeigth(wh); 
