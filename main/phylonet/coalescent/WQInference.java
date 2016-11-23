@@ -585,7 +585,7 @@ public class WQInference extends AbstractInference<Tripartition> {
 		criticalNd.alt1freqs /= nodeDataList.size();
 		criticalNd.alt2freqs /= nodeDataList.size();
 		criticalNd.effn /= nodeDataList.size();
-		criticalNd.quartcount /= nodeDataList.size
+		criticalNd.quartcount /= nodeDataList.size();
 
 		return criticalNd;
 	}
