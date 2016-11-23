@@ -215,7 +215,7 @@ public class WQInference extends AbstractInference<Tripartition> {
 	
 	private class NodeData {
 		double mainfreq, alt1freqs, alt2freqs;
-		Long quartcount;
+		long quartcount;
 		double effn ;
 		Quadrapartition [] quads  = {null, null, null};
 		STBipartition[] bipartitions = {null, null, null};
@@ -578,12 +578,14 @@ public class WQInference extends AbstractInference<Tripartition> {
 				criticalNd.alt1freqs += ndI.alt1freqs;
 				criticalNd.alt2freqs += ndI.alt2freqs;				
 				criticalNd.effn += ndI.effn;
+				criticalNd.quartcount += ndI.quartcount;
 
 		} 
 		criticalNd.mainfreq /= nodeDataList.size();
 		criticalNd.alt1freqs /= nodeDataList.size();
 		criticalNd.alt2freqs /= nodeDataList.size();
 		criticalNd.effn /= nodeDataList.size();
+		criticalNd.quartcount /= nodeDataList.size
 
 		return criticalNd;
 	}
@@ -604,6 +606,7 @@ public class WQInference extends AbstractInference<Tripartition> {
 					criticalNd.quads[0] = ndI.quads[0];
 					criticalNd.mainfreq = ndI.mainfreq;
 					criticalNd.effn = ndI.effn;
+					criticalNd.quartcount = ndI.quartcount;
 				}
 				if (toAnnotateAltTopologies()) {
 					if (ndI.postQ2.getPost() < minPostQ2) {
@@ -757,12 +760,11 @@ public class WQInference extends AbstractInference<Tripartition> {
 		nd.alt1freqs=s.qs[1];
 	
 		nd.alt2freqs=s.qs[2];
-
 		nd.quartcount= (c1.getClusterSize()+0l)
 				* (c2.getClusterSize()+0l)
 				* (sister.getClusterSize()+0l)
 				* (remaining.getClusterSize()+0l);
-		
+
 		this.setLocalPP(nd);
 		return nd;
 	}
