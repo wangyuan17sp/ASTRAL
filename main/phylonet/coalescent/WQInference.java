@@ -444,6 +444,7 @@ public class WQInference extends AbstractInference<Tripartition> {
 			STINode node = (STINode) n;
 
 			if (node.isLeaf() || node.getParent() == null || node.getParent().getParent() == null) {
+				node.setData(null);
 				continue;
 			}
 			node.setData(finalNodeDataList.poll().toString2(this.getBranchAnnotation()));
@@ -648,6 +649,7 @@ public class WQInference extends AbstractInference<Tripartition> {
 				ArrayList<STITreeCluster> belowClusters = listClustersBelowNode(n, depth);
 				ArrayList<STITreeCluster> aboveClusters = listClustersAboveParentNode(n.getParent(), depth);
 				
+				
 //				allBelowClusters.add(belowClusters);
 //				allAboveClusters.add(aboveClusters);
 				NodeData nd = new NodeData();
@@ -752,6 +754,7 @@ public class WQInference extends AbstractInference<Tripartition> {
 							criticalNd.bipartitions[0] = ndI.bipartitions[0];
 							criticalNd.mainfreq = ndI.mainfreq;
 							criticalNd.effn = ndI.effn;
+							criticalNd.quartcount = ndI.quartcount;
 						}
 						if(ndI.postQ2.getPost() < minPostQ2){
 							minPostQ2 = ndI.postQ2.getPost();
