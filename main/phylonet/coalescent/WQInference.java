@@ -361,11 +361,11 @@ public class WQInference extends AbstractInference<Tripartition> {
 		return false;
 	}
 	private void setLocalPP(NodeData nd){
-		Double f1 = nd.mainfreq;
-		Double f2 = nd.alt1freqs;
-		Double f3 = nd.alt2freqs;
-		Long quarc = nd.quartcount;
-		Double effni = nd.effn + 0.0;
+		double f1  = nd.mainfreq;
+		double f2  = nd.alt1freqs;
+		double f3  = nd.alt2freqs;
+		long quarc = nd.quartcount;
+		double effni = nd.effn + 0.0;
 		
 		if ( Math.abs((f1+f2+f3) - effni) > 0.01 ) {
 			effni = f1 + f2 + f3;
@@ -374,19 +374,15 @@ public class WQInference extends AbstractInference<Tripartition> {
 		
 		Posterior post = new Posterior(
 				f1,f2,f3,(double)effni, options.getLambda());
-		
+		System.out.println("the posterior is:" + post.getPost());
 		nd.postQ1 = post;
 		nd.post = post.getPost();
 		
 		if (toAnnotateAltTopologies()) {
-				
-			double postQ1 = post.getPost();
 			post = new Posterior(f2,f1,f3,(double)effni, options.getLambda());
 			nd.postQ2 = post;
-			double postQ2 = post.getPost();
 			post =  new Posterior(f3,f1,f2,(double)effni, options.getLambda());
 			nd.postQ3 = post;
-			double postQ3 = post.getPost();
 		}
 	}
 	private void scoreBranches(Tree st, int depth){
@@ -470,12 +466,13 @@ public class WQInference extends AbstractInference<Tripartition> {
 		ArrayList<STITreeCluster> sisterClusters = cllists[2];
 		ArrayList<STITreeCluster> remainingClusters = cllists[3];
 
-		ArrayList<STITreeCluster>[] topcls = clustersAtDepth(1, node);
-		STITreeCluster belowCl1 = topcls[0].get(0);
-		STITreeCluster belowCl2 = topcls[1].get(0);
-		STITreeCluster sisterCl = topcls[2].get(0);
-		STITreeCluster remainingCl = topcls[3].get(0);
+		STITreeCluster[] topcls = summerizeClusters(belowClusters1, belowClusters2, sisterClusters, remainingClusters);
 		
+		STITreeCluster belowCl1 = topcls[0];
+		STITreeCluster belowCl2 = topcls[1];
+		STITreeCluster sisterCl = topcls[2];
+		STITreeCluster remainingCl = topcls[3];
+
 		
 		System.err.println(belowClusters1.size() +" "+belowClusters2.size() + " "+
 				sisterClusters.size() + " "+ remainingClusters.size());
@@ -526,22 +523,8 @@ public class WQInference extends AbstractInference<Tripartition> {
 		else {
 			throw new RuntimeException("Hmm, bad summerization method option; "+this.options.getSumMethod());
 		}
-		summerizedNd.postQ1 = new Posterior(summerizedNd.mainfreq, 
-				summerizedNd.alt1freqs, summerizedNd.alt2freqs, 
-				summerizedNd.effn, options.getLambda());
-		summerizedNd.postQ2 = new Posterior(summerizedNd.alt1freqs, 
-				summerizedNd.mainfreq, summerizedNd.alt2freqs, 
-				summerizedNd.effn, options.getLambda());
-		summerizedNd.postQ3 = new Posterior(summerizedNd.alt2freqs, 
-				summerizedNd.mainfreq, summerizedNd.alt1freqs, 
-				summerizedNd.effn, options.getLambda());
-		summerizedNd.quads[0] = weightCalculator2.new Quadrapartition
-										(belowCl1, belowCl2, sisterCl, remainingCl, true);
-		summerizedNd.quads[1] = weightCalculator2.new Quadrapartition
-				(belowCl1, sisterCl, belowCl2, remainingCl, true);
-		summerizedNd.quads[2] = weightCalculator2.new Quadrapartition
-				(belowCl1, remainingCl, belowCl2, sisterCl, true);
-			
+		
+		
 		STITreeCluster cluster = new STITreeCluster(belowCl1);
 		cluster.getBitSet().or(belowCl2.getBitSet());
 		STBipartition bmain = new STBipartition(cluster , cluster.complementaryCluster());
@@ -556,7 +539,7 @@ public class WQInference extends AbstractInference<Tripartition> {
 		
 		node.setParentDistance(bl);
 		summerizedNd.bipartitions = biparts;
-		summerizedNd.setString(this.getBranchAnnotation());			
+		summerizedNd.setString(this.getBranchAnnotation());		
 		System.err.println(summerizedNd.data);
 		
 		return summerizedNd;
@@ -565,6 +548,37 @@ public class WQInference extends AbstractInference<Tripartition> {
 	
 	
 	
+
+	private STITreeCluster[] summerizeClusters(
+			ArrayList<STITreeCluster> belowClusters1,
+			ArrayList<STITreeCluster> belowClusters2,
+			ArrayList<STITreeCluster> sisterClusters,
+			ArrayList<STITreeCluster> remainingClusters) {
+		
+		STITreeCluster cluster1  = new STITreeCluster();
+		STITreeCluster cluster2  = new STITreeCluster();
+		STITreeCluster sister    = new STITreeCluster();
+		STITreeCluster remaining = new STITreeCluster();
+		
+		for (STITreeCluster c: belowClusters1) {
+			cluster1.getBitSet().or(c.getBitSet());
+		}
+		
+		for (STITreeCluster c: belowClusters2) {
+			cluster2.getBitSet().or(c.getBitSet());
+		}
+		
+		for (STITreeCluster c: sisterClusters) {
+			sister.getBitSet().or(c.getBitSet());
+		}
+		
+		for (STITreeCluster c: remainingClusters) {
+			remaining.getBitSet().or(c.getBitSet());
+		}
+		
+		return new STITreeCluster [] {cluster1, cluster2, sister, remaining};
+	}
+
 
 	private NodeData findNDWithAverageLoalPP(ArrayList<NodeData> nodeDataList) {
 		NodeData criticalNd= new NodeData();
@@ -587,6 +601,18 @@ public class WQInference extends AbstractInference<Tripartition> {
 		criticalNd.effn /= nodeDataList.size();
 		criticalNd.quartcount /= nodeDataList.size();
 
+		criticalNd.postQ1 = new Posterior(criticalNd.mainfreq, 
+				criticalNd.alt1freqs, criticalNd.alt2freqs, 
+				criticalNd.effn, options.getLambda());
+		
+		criticalNd.postQ2 = new Posterior(criticalNd.alt1freqs, 
+				criticalNd.mainfreq, criticalNd.alt2freqs, 
+				criticalNd.effn, options.getLambda());
+		
+		criticalNd.postQ3 = new Posterior(criticalNd.alt2freqs, 
+				criticalNd.mainfreq, criticalNd.alt1freqs, 
+				criticalNd.effn, options.getLambda());
+		
 		return criticalNd;
 	}
 
@@ -637,6 +663,9 @@ public class WQInference extends AbstractInference<Tripartition> {
 			ArrayList<STITreeCluster> remainingClusters,
 			STITreeCluster remainingCl) {
 		ArrayList<NodeData> nodeDataList = new ArrayList<NodeData>();
+		
+			
+		
 		for (STITreeCluster c1: belowClusters1) {
 	
 			nodeDataList.add(ScoreAQuadripartion(c1, belowCl2, sisterCl, remainingCl));
@@ -753,6 +782,13 @@ public class WQInference extends AbstractInference<Tripartition> {
 		}
 		NodeData nd = new NodeData();
 
+		nd.quads[0] = weightCalculator2.new Quadrapartition
+				(c1, c2, sister, remaining, false);
+		nd.quads[1] = weightCalculator2.new Quadrapartition
+				(c1, sister, c2, remaining, false);
+		nd.quads[2] = weightCalculator2.new Quadrapartition
+				(c1, remaining, c2, sister, false);
+		
 		Results s = weightCalculator2.getWeight(quad);
 		nd.mainfreq = s.qs[0];
 		nd.effn = (double) s.effn + 0.0;
@@ -764,7 +800,7 @@ public class WQInference extends AbstractInference<Tripartition> {
 				* (c2.getClusterSize()+0l)
 				* (sister.getClusterSize()+0l)
 				* (remaining.getClusterSize()+0l);
-
+		
 		this.setLocalPP(nd);
 		return nd;
 	}
