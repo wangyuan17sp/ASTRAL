@@ -2,9 +2,11 @@ package phylonet.coalescent;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Deque;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.Queue;
 import java.util.Stack;
 
@@ -427,26 +429,23 @@ public class WQInference extends AbstractInference<Tripartition> {
 		}
 		
 		stack = new Stack<STITreeCluster>();
-		Queue<NodeData> finalNodeDataList = new LinkedList<NodeData>();
+		Map<TNode,NodeData> finalNodeDataList = new HashMap<TNode,NodeData>();
 		for (TNode n: st.postTraverse()) {
 			if (n.isLeaf() || n.getParent() == null || n.getParent().getParent() == null
 					|| n.getChildCount() > 2) {
 				continue;
 			} else {
-				finalNodeDataList.add(scoreSTNode(depth, n));
+				finalNodeDataList.put(n,scoreSTNode(depth, n));
 			}
 		}
 		for (TNode n: st.postTraverse()) {
 			STINode node = (STINode) n;
 
-			if (node.isLeaf() || node.getParent() == null || node.getParent().getParent() == null
-					|| n.getChildCount() > 2) {
+			if (finalNodeDataList.containsKey(n)) {
+				node.setData(finalNodeDataList.get(node).toString2(this.getBranchAnnotation()));
+			} else {
 				node.setData(null);
-				continue;
 			}
-			NodeData d = finalNodeDataList.poll();
-			if (d!=null)
-				node.setData(d.toString2(this.getBranchAnnotation()));
 			
 		}
 	}
