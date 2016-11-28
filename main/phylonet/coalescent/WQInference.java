@@ -332,8 +332,7 @@ public class WQInference extends AbstractInference<Tripartition> {
 		}
 		return retClusters;
 		
-	}
-	
+	}	
 	
 	private ArrayList<STITreeCluster> listClustersAboveParentNode(TNode node, int maxDist){
 		ArrayList<STITreeCluster> retClusters = new ArrayList<STITreeCluster>();
@@ -355,6 +354,7 @@ public class WQInference extends AbstractInference<Tripartition> {
 		}
 		return retClusters;
 	}
+	
 	private boolean toAnnotateAltTopologies() {
 		if (this.getBranchAnnotation() != 0 && this.getBranchAnnotation() != 1 && this.getBranchAnnotation() != 10 && 
 				this.getBranchAnnotation() != 3 && this.getBranchAnnotation() != 12 && this.getBranchAnnotation() % 2 == 0) {
@@ -362,6 +362,7 @@ public class WQInference extends AbstractInference<Tripartition> {
 		}
 		return false;
 	}
+	
 	private void setLocalPP(NodeData nd){
 		double f1  = nd.mainfreq;
 		double f2  = nd.alt1freqs;
@@ -387,6 +388,7 @@ public class WQInference extends AbstractInference<Tripartition> {
 			nd.postQ3 = post;
 		}
 	}
+	
 	private void scoreBranches(Tree st, int depth){
 		System.out.println(depth);
 		System.out.println(options.getBranchannotation());
@@ -527,13 +529,20 @@ public class WQInference extends AbstractInference<Tripartition> {
 		STITreeCluster cluster = new STITreeCluster(belowCl1);
 		cluster.getBitSet().or(belowCl2.getBitSet());
 		STBipartition bmain = new STBipartition(cluster , cluster.complementaryCluster());
+		
 		STITreeCluster c1plussis = new STITreeCluster(belowCl1);
 		c1plussis.getBitSet().or(sisterCl.getBitSet());
 		STBipartition b2 = new STBipartition(c1plussis, c1plussis.complementaryCluster());
+		
 		STITreeCluster c1plusrem = new STITreeCluster(belowCl1);
 		c1plusrem.getBitSet().or(remainingCl.getBitSet());
 		STBipartition b3 = new STBipartition(c1plusrem, c1plusrem.complementaryCluster());	
+		
 		STBipartition[] biparts = new STBipartition[] {bmain, b2, b3};	
+		
+		reorderClusters(summerizedNd, bmain, b2, b3);
+		
+		
 		double bl = summerizedNd.postQ1.branchLength();
 		
 		node.setParentDistance(bl);
@@ -547,6 +556,22 @@ public class WQInference extends AbstractInference<Tripartition> {
 	
 	
 	
+
+	private void reorderClusters(NodeData node, STBipartition bmain,
+			STBipartition b2, STBipartition b3) {
+		// TODO Auto-generated method stub
+		STITreeCluster tmpcluster = new STITreeCluster(node.quads[1].cluster1);
+		tmpcluster.getBitSet().or(node.quads[1].cluster2.getBitSet());
+		tmpcluster.getBitSet().xor(b2.cluster1.getBitSet());
+		
+		if (tmpcluster.getBitSet().nextSetBit(0) == 0) {
+			
+		}
+		
+		int n = tmpcluster.getBitSet().nextSetBit(0);
+		
+	}
+
 
 	private STITreeCluster[] summerizeClusters(
 			ArrayList<STITreeCluster> belowClusters1,
@@ -770,8 +795,6 @@ public class WQInference extends AbstractInference<Tripartition> {
 
 	private NodeData ScoreAQuadripartion(STITreeCluster c1, STITreeCluster c2,
 			STITreeCluster sister, STITreeCluster remaining) {
-		Quadrapartition quad = weightCalculator2.new Quadrapartition
-				(c1,  c2, sister, remaining, false);
 		
 		//TODO: figure out this
 		if (this.getBranchAnnotation() == 7){
@@ -781,24 +804,29 @@ public class WQInference extends AbstractInference<Tripartition> {
 		}
 		NodeData nd = new NodeData();
 
-		nd.quads[0] = weightCalculator2.new Quadrapartition
-				(c1, c2, sister, remaining, false);
-		nd.quads[1] = weightCalculator2.new Quadrapartition
-				(c1, sister, c2, remaining, false);
-		nd.quads[2] = weightCalculator2.new Quadrapartition
-				(c1, remaining, c2, sister, false);
+		
+		Quadrapartition quad = weightCalculator2.new Quadrapartition
+				(c1,  c2, sister, remaining, false);
+		
 		
 		Results s = weightCalculator2.getWeight(quad);
 		nd.mainfreq = s.qs[0];
-		nd.effn = (double) s.effn + 0.0;
-		
-		nd.alt1freqs=s.qs[1];
-	
-		nd.alt2freqs=s.qs[2];
-		nd.quartcount= (c1.getClusterSize()+0l)
+		nd.alt1freqs = s.qs[1];	
+		nd.alt2freqs = s.qs[2];
+		nd.effn = (double) s.effn + 0.0;		
+		nd.quartcount = (c1.getClusterSize()+0l)
 				* (c2.getClusterSize()+0l)
 				* (sister.getClusterSize()+0l)
 				* (remaining.getClusterSize()+0l);
+		
+		
+		nd.quads[0] = weightCalculator2.new Quadrapartition
+				(c1, c2, sister, remaining, true);
+		
+		nd.quads[1] = weightCalculator2.new Quadrapartition
+				(c1, sister, c2, remaining, true);
+		nd.quads[2] = weightCalculator2.new Quadrapartition
+				(c1, remaining, c2, sister, true);
 		
 		this.setLocalPP(nd);
 		return nd;
