@@ -494,7 +494,7 @@ public class WQInference extends AbstractInference<Tripartition> {
 					summerizedNd = findNDWithMinimumLocalPP(nodeDataList);
 				}
 				if (this.options.getSumMethod() == 3) {
-					summerizedNd = findNDWithAverageLoalPP(nodeDataList);
+					summerizedNd = findNDWithAverageLoalPP(nodeDataList, belowCl1, belowCl2, sisterCl, remainingCl);
 				}
 		}
 		else if (this.options.getSumMethod() == 1 || this.options.getSumMethod() == 4) {
@@ -506,7 +506,7 @@ public class WQInference extends AbstractInference<Tripartition> {
 				summerizedNd = findNDWithMinimumLocalPP(nodeDataList);
 			}
 			if (this.options.getSumMethod() == 4) {
-				summerizedNd = findNDWithAverageLoalPP(nodeDataList);
+				summerizedNd = findNDWithAverageLoalPP(nodeDataList, belowCl1, belowCl2, sisterCl, remainingCl);
 			}
 		}
 		else if (this.options.getSumMethod() == 2 || this.options.getSumMethod() == 5) { 	
@@ -518,7 +518,7 @@ public class WQInference extends AbstractInference<Tripartition> {
 				summerizedNd = findNDWithMinimumLocalPP(nodeDataList);
 			}
 			if (this.options.getSumMethod() == 5) {
-				summerizedNd = findNDWithAverageLoalPP(nodeDataList);
+				summerizedNd = findNDWithAverageLoalPP(nodeDataList, belowCl1, belowCl2, sisterCl, remainingCl);
 			}
 		}
 		else {
@@ -656,7 +656,7 @@ public class WQInference extends AbstractInference<Tripartition> {
 	}
 
 
-	private NodeData findNDWithAverageLoalPP(ArrayList<NodeData> nodeDataList) {
+	private NodeData findNDWithAverageLoalPP(ArrayList<NodeData> nodeDataList, STITreeCluster c1, STITreeCluster c2, STITreeCluster sister, STITreeCluster remaining) {
 		NodeData criticalNd= new NodeData();
 		for(NodeData ndI: nodeDataList){
 				if (ndI == null) {
@@ -688,7 +688,13 @@ public class WQInference extends AbstractInference<Tripartition> {
 		criticalNd.postQ3 = new Posterior(criticalNd.alt2freqs, 
 				criticalNd.mainfreq, criticalNd.alt1freqs, 
 				criticalNd.effn, options.getLambda());
+		criticalNd.quads[0] = weightCalculator2.new Quadrapartition
+				(c1, c2, sister, remaining, true);
 		
+		criticalNd.quads[1] = weightCalculator2.new Quadrapartition
+				(c1, sister, c2, remaining, true);
+		criticalNd.quads[2] = weightCalculator2.new Quadrapartition
+				(c1, remaining, c2, sister, true);
 		return criticalNd;
 	}
 
@@ -863,8 +869,8 @@ public class WQInference extends AbstractInference<Tripartition> {
 		
 		Results s = weightCalculator2.getWeight(quad);
 		nd.mainfreq = s.qs[0];
-		nd.alt1freqs = s.qs[1];	
-		nd.alt2freqs = s.qs[2];
+		nd.alt1freqs = s.qs[2];	
+		nd.alt2freqs = s.qs[1];
 		nd.effn = (double) s.effn + 0.0;		
 		nd.quartcount = (c1.getClusterSize()+0l)
 				* (c2.getClusterSize()+0l)
