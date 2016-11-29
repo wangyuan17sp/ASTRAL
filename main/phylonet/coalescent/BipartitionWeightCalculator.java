@@ -199,7 +199,9 @@ class BipartitionWeightCalculator extends AbstractWeightCalculator<Tripartition>
 					fi[1]+= allcases(swap1(side1), swap1(side2), swap1(side3));
 					
 					fi[2]+= allcases(swap2(side1), swap2(side2), swap2(side3));
-	
+					//swap2(side1); swap2(side2); swap2(side3);
+					//swap1(side1); swap1(side2); swap1(side3);
+					
 					//geneTreesAsIntersects[n] = newSide;
 				} else {
 					/*Intersects side1 = stack.pop();

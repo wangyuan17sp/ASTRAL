@@ -879,8 +879,7 @@ public class WQInference extends AbstractInference<Tripartition> {
 		
 		
 		nd.quads[0] = weightCalculator2.new Quadrapartition
-				(c1, c2, sister, remaining, true);
-		
+				(c1, c2, sister, remaining, true);		
 		nd.quads[1] = weightCalculator2.new Quadrapartition
 				(c1, sister, c2, remaining, true);
 		nd.quads[2] = weightCalculator2.new Quadrapartition
@@ -994,8 +993,7 @@ public class WQInference extends AbstractInference<Tripartition> {
 				else {
 					remaining = ((STITreeCluster)node.getParent().getData()).complementaryCluster();
 				}
-				Quadrapartition quad = weightCalculator2.new Quadrapartition
-						(c1,  c2, sister, remaining, true);
+				
 				if (this.getBranchAnnotation() == 7){
 					if (remaining.getClusterSize() != 0 && sister.getClusterSize() != 0 && c2.getClusterSize() != 0 && c1.getClusterSize() != 0 ){
 						System.err.print(c1.toString()+c2.toString()+"|"+sister.toString()+remaining.toString()+"\n");
@@ -1005,9 +1003,26 @@ public class WQInference extends AbstractInference<Tripartition> {
 				/**
 				 * 2. Scores all three quadripartitoins
 				 */
+
+				Quadrapartition quad = weightCalculator2.new Quadrapartition
+						(c1,  c2, sister, remaining, false);
+				
+				Quadrapartition quadmain = weightCalculator2.new Quadrapartition
+						(c1,  c2, sister, remaining, true);
+				
+				Quadrapartition quad2 = weightCalculator2.new Quadrapartition
+						(c1,  sister, c2, remaining, true);
+				
+				Quadrapartition quad3 = weightCalculator2.new Quadrapartition
+						(c1,  remaining, c2, sister, true);
+				
+				
+				
 				Results s = weightCalculator2.getWeight(quad);
 				nd.mainfreq = s.qs[0];
 				nd.effn = (double) s.effn + 0.0;
+				nd.alt1freqs = s.qs[2];	
+				nd.alt2freqs = s.qs[1];
 				
 				
 				if (nd.effn < 20) {
@@ -1017,15 +1032,17 @@ public class WQInference extends AbstractInference<Tripartition> {
 							":\n\t" +
 							GlobalMaps.taxonNameMap.getSpeciesIdMapper().getSTClusterForGeneCluster(cluster));
 				}
+
 				
-				Quadrapartition[] threequads = new Quadrapartition [] {quad, null,null};
+				Quadrapartition[] threequads = new Quadrapartition [] {quadmain, quad2, quad3};
 				
-				s = weightCalculator2.getWeight(quad);
-				nd.alt1freqs=s.qs[1];
 				
-				s = weightCalculator2.getWeight(quad);
-				nd.alt2freqs=s.qs[2];
+				
+				
+				
 			
+				
+				
 				nd.quartcount= (c1.getClusterSize()+0l)
 						* (c2.getClusterSize()+0l)
 						* (sister.getClusterSize()+0l)
@@ -1033,6 +1050,7 @@ public class WQInference extends AbstractInference<Tripartition> {
 
 					
 				if (this.getBranchAnnotation() == 6) {
+					
 					STITreeCluster c1plussis = new STITreeCluster();
 					c1plussis.setCluster((BitSet) c1.getBitSet().clone());
 					c1plussis.getBitSet().or(sister.getBitSet());
