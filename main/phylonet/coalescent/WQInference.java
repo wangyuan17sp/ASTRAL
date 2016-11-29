@@ -539,14 +539,14 @@ public class WQInference extends AbstractInference<Tripartition> {
 		STBipartition b3 = new STBipartition(c1plusrem, c1plusrem.complementaryCluster());	
 		
 		STBipartition[] biparts = new STBipartition[] {bmain, b2, b3};	
-		
+		summerizedNd.bipartitions = biparts;
+
 		reorderClusters(summerizedNd, bmain, b2, b3);
 		
 		
 		double bl = summerizedNd.postQ1.branchLength();
 		
 		node.setParentDistance(bl);
-		summerizedNd.bipartitions = biparts;
 		summerizedNd.setString(this.getBranchAnnotation());		
 		System.err.println(summerizedNd.data);
 		
@@ -560,16 +560,68 @@ public class WQInference extends AbstractInference<Tripartition> {
 	private void reorderClusters(NodeData node, STBipartition bmain,
 			STBipartition b2, STBipartition b3) {
 		// TODO Auto-generated method stub
-		STITreeCluster tmpcluster = new STITreeCluster(node.quads[1].cluster1);
-		tmpcluster.getBitSet().or(node.quads[1].cluster2.getBitSet());
-		tmpcluster.getBitSet().xor(b2.cluster1.getBitSet());
+		reorderACluster(node.quads[0], bmain);
+		if (toAnnotateAltTopologies()) {
+			reorderACluster(node.quads[1], b2);
+			reorderACluster(node.quads[2], b3);
+		}
+	}
+
+
+	private void reorderACluster(Quadrapartition quad,
+			STBipartition bipart) {
+		// TODO Auto-generated method stub
+		STITreeCluster tmpcluster12 = new STITreeCluster(quad.cluster1);
+		tmpcluster12.getBitSet().or(quad.cluster2.getBitSet());
 		
-		if (tmpcluster.getBitSet().nextSetBit(0) == 0) {
-			
+		STITreeCluster tmpcluster34 = new STITreeCluster(quad.cluster3);
+		tmpcluster34.getBitSet().or(quad.cluster4.getBitSet());
+
+		
+		if (!bipart.cluster1.getBitSet().contains(tmpcluster12.getBitSet()) || 
+				!bipart.cluster2.getBitSet().contains(tmpcluster34.getBitSet())) {
+			swapClusters12AndClusters34(quad);
+			checkIfQuadMatchesBipart(quad, bipart);
 		}
 		
-		int n = tmpcluster.getBitSet().nextSetBit(0);
+	}
+
+
+	private void checkIfQuadMatchesBipart(Quadrapartition quad , STBipartition bipart) {
+		// TODO Auto-generated method stub
+		STITreeCluster tmpcluster12 = new STITreeCluster(quad.cluster1);
+		STITreeCluster tmpcluster34 = new STITreeCluster(quad.cluster3);
 		
+		tmpcluster12.getBitSet().or(quad.cluster2.getBitSet());
+		tmpcluster34.getBitSet().or(quad.cluster4.getBitSet());
+		
+		if (!bipart.cluster1.getBitSet().contains(tmpcluster12.getBitSet()) || 
+				!bipart.cluster2.getBitSet().contains(tmpcluster34.getBitSet())) {
+
+			throw new RuntimeException("Hmm, this shouldn't happen; "+ tmpcluster12.getBitSet().nextSetBit(0) + " " + tmpcluster34.getBitSet().nextSetBit(0));
+		}
+	}
+
+
+	private void swapClusters12AndClusters34(Quadrapartition quad) {
+		// TODO Auto-generated method stub
+		STITreeCluster tmp1 = new STITreeCluster(quad.cluster3);
+		STITreeCluster tmp2 = new STITreeCluster(quad.cluster4);
+		quad.cluster3 = quad.cluster1;
+		quad.cluster4 = quad.cluster2;
+		quad.cluster1 = tmp1;
+		quad.cluster2 = tmp2;
+	}
+	
+
+
+	private void extracted(NodeData node) {
+		STITreeCluster tmp1 = new STITreeCluster(node.quads[1].cluster3);
+		STITreeCluster tmp2 = new STITreeCluster(node.quads[1].cluster4);
+		node.quads[1].cluster3 = node.quads[1].cluster1;
+		node.quads[1].cluster4 = node.quads[1].cluster2;
+		node.quads[1].cluster1 = tmp1;
+		node.quads[1].cluster2 = tmp2;
 	}
 
 
