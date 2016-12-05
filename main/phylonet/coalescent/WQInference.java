@@ -231,10 +231,10 @@ public class WQInference extends AbstractInference<Tripartition> {
 			this.data = s;
 		}
 		void setString(int i){
-			Double f1 = mainfreq;
-			Double f2 = alt1freqs;
-			Double f3 = alt2freqs;
-			Double effni = effn;
+			double f1 = mainfreq;
+			double f2 = alt1freqs;
+			double f3 = alt2freqs;
+			double effni = effn;
 			
 			if (i == 0){
 				this.setData(null);
@@ -277,10 +277,10 @@ public class WQInference extends AbstractInference<Tripartition> {
 			}
 		}
 		String toString2(int i){
-			Double f1 = mainfreq;
-			Double f2 = alt1freqs;
-			Double f3 = alt2freqs;
-			Double effni = effn;
+			double f1 = mainfreq;
+			double f2 = alt1freqs;
+			double f3 = alt2freqs;
+			double effni = effn;
 			
 			if (i == 0){
 				return null;
@@ -372,6 +372,7 @@ public class WQInference extends AbstractInference<Tripartition> {
 		double effni = nd.effn + 0.0;
 		
 		if ( Math.abs((f1+f2+f3) - effni) > 0.01 ) {
+			//System.err.println("Adjusting effective N from\t" + effni + "\tto\t" + (f1 + f2 + f3) + ". This should only happen as a result of polytomies in gene trees.");
 			effni = f1 + f2 + f3;
 		}
 		
@@ -661,34 +662,30 @@ public class WQInference extends AbstractInference<Tripartition> {
 		NodeData criticalNd= new NodeData();
 		for(NodeData ndI: nodeDataList){
 				if (ndI == null) {
-					throw new RuntimeException("Hmm, this shouldn't happen; "+ndI);
+					throw new RuntimeException("Hmm, this shouldn't happen; " + ndI);
 				}
-
 				criticalNd.mainfreq += ndI.mainfreq;
-
 				criticalNd.alt1freqs += ndI.alt1freqs;
 				criticalNd.alt2freqs += ndI.alt2freqs;				
 				criticalNd.effn += ndI.effn;
 				criticalNd.quartcount += ndI.quartcount;
 
 		} 
-		criticalNd.mainfreq /= nodeDataList.size();
-		criticalNd.alt1freqs /= nodeDataList.size();
-		criticalNd.alt2freqs /= nodeDataList.size();
-		criticalNd.effn /= nodeDataList.size();
-		criticalNd.quartcount /= nodeDataList.size();
-
-		criticalNd.postQ1 = new Posterior(criticalNd.mainfreq, 
-				criticalNd.alt1freqs, criticalNd.alt2freqs, 
-				criticalNd.effn, options.getLambda());
 		
-		criticalNd.postQ2 = new Posterior(criticalNd.alt1freqs, 
-				criticalNd.mainfreq, criticalNd.alt2freqs, 
-				criticalNd.effn, options.getLambda());
+		criticalNd.mainfreq  /= (nodeDataList.size() + 0.0);
+		criticalNd.alt1freqs /= (nodeDataList.size() + 0.0);
+		criticalNd.alt2freqs /= (nodeDataList.size() + 0.0);
+		criticalNd.effn /= (nodeDataList.size() + 0.0);
+		criticalNd.quartcount /= (nodeDataList.size() + 0.0);
+		setLocalPP(criticalNd);
 		
-		criticalNd.postQ3 = new Posterior(criticalNd.alt2freqs, 
-				criticalNd.mainfreq, criticalNd.alt1freqs, 
-				criticalNd.effn, options.getLambda());
+		
+		System.err.println("Here! The size of nodeDataList data size is " + nodeDataList.size() + 
+				" The main freq is " + criticalNd.mainfreq + " The alt1 freq is " + criticalNd.alt1freqs + " The alt2 freq is " + criticalNd.alt2freqs + 
+				" The effectiven is " + criticalNd.effn + " The posterior probability is " + criticalNd.postQ1.getPost());
+		
+		
+		
 		criticalNd.quads[0] = weightCalculator2.new Quadrapartition
 				(c1, c2, sister, remaining, true);
 		
@@ -734,7 +731,10 @@ public class WQInference extends AbstractInference<Tripartition> {
 				}
 
 		} 
-
+		System.err.println("Here! The size of nodeDataList data size is " + nodeDataList.size() + 
+				" The main freq is " + criticalNd.mainfreq + " The alt1 freq is " + criticalNd.alt1freqs + " The alt2 freq is " + criticalNd.alt2freqs + 
+				" The effectiven is " + criticalNd.effn + " The posterior probability is " + criticalNd.postQ1.getPost());
+		
 		return criticalNd;
 	}
 
@@ -868,11 +868,28 @@ public class WQInference extends AbstractInference<Tripartition> {
 				(c1,  c2, sister, remaining, false);
 		
 		
-		Results s = weightCalculator2.getWeight(quad);
-		nd.mainfreq = s.qs[0];
-		nd.alt1freqs = s.qs[2];	
-		nd.alt2freqs = s.qs[1];
-		nd.effn = (double) s.effn + 0.0;		
+		Results2 s = weightCalculator2.getWeight2(quad);
+		//Results s = weightCalculator2.getWeight(quad);
+		//nd.mainfreq = s.qs[0];
+		nd.mainfreq = s.qs;
+		
+		Quadrapartition quad2 = weightCalculator2.new Quadrapartition
+				(c1,  sister, c2, remaining, false);
+		s = weightCalculator2.getWeight2(quad2);
+		
+		nd.alt1freqs = s.qs;	
+		//nd.alt1freqs = s.qs[2];
+		Quadrapartition quad3 = weightCalculator2.new Quadrapartition
+				(c1,  remaining, c2, sister, false);
+		s = weightCalculator2.getWeight2(quad3);
+		nd.alt2freqs = s.qs;
+		
+		//nd.alt2freqs = s.qs[1];
+		nd.effn = (double) s.effn + 0.0;	
+		if (nd.mainfreq > nd.effn) {
+			throw new RuntimeException("Hmm, this shouldn't happen; effectiven is smaller than mainfreq " + 
+		nd.effn + " " + nd.mainfreq);
+		}
 		nd.quartcount = (c1.getClusterSize()+0l)
 				* (c2.getClusterSize()+0l)
 				* (sister.getClusterSize()+0l)

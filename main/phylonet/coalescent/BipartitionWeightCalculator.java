@@ -292,9 +292,9 @@ class BipartitionWeightCalculator extends AbstractWeightCalculator<Tripartition>
 			}
 			if (gtb == Integer.MIN_VALUE) {
 				if (!cruise) {
-					weight[0] += (fi[0]+0.0)/(mi*2.0);
-					weight[1] += (fi[1]+0.0)/(mi*2.0);
-					weight[2] += (fi[2]+0.0)/(mi*2.0);
+					weight[0] += (fi[0]+0.0)/(2.0*mi);
+					weight[1] += (fi[1]+0.0)/(2.0*mi);
+					weight[2] += (fi[2]+0.0)/(2.0*mi);
 				}
 				stack.clear();
 				newTree = true;
@@ -317,10 +317,24 @@ class BipartitionWeightCalculator extends AbstractWeightCalculator<Tripartition>
 	
 					fi[0] += allcases(side1, side2, side3);
 					
-					fi[1] += allcases(swap1(side1), swap1(side2), swap1(side3));
+					Intersects side1t = new Intersects(side1);
+					Intersects side2t = new Intersects(side2);
+					Intersects side3t = new Intersects(side3);
 					
+					fi[1] += allcases(swap1(side1), swap1(side2), swap1(side3));					
 					fi[2] += allcases(swap2(side1), swap2(side2), swap2(side3));
+					swap2(side1); swap2(side2);  swap2(side3);
+					swap1(side1); swap1(side2); swap1(side3);
 					
+					if (!side1.equals(side1t)) {
+						throw new RuntimeException("Hmm, side1 has changed");
+					}
+					if (!side2.equals(side2t)) {
+						throw new RuntimeException("Hmm, side2 has changed");
+					}
+					if (!side3.equals(side3t)) {
+						throw new RuntimeException("Hmm, side3 has changed");
+					}
 					//geneTreesAsIntersects[n] = newSide;
 				} else {
 					/*Intersects side1 = stack.pop();
@@ -362,11 +376,26 @@ class BipartitionWeightCalculator extends AbstractWeightCalculator<Tripartition>
 	                        
 	                        for (int k = j+1; k < children.size(); k++) {
 	                            Intersects side3 = children.get(k);
-	                            fi[0] += allcases(side1,side2,side3);
-	                            
+	                            fi[0] += allcases(side1, side2, side3);
+	                            Intersects side1t = new Intersects(side1);
+	        					Intersects side2t = new Intersects(side2);
+	        					Intersects side3t = new Intersects(side3);
 	        					fi[1] += allcases(swap1(side1), swap1(side2), swap1(side3));
+	        					        					
 	        					
 	        					fi[2] += allcases(swap2(side1), swap2(side2), swap2(side3));
+	        					swap2(side1); swap2(side2); swap2(side3);
+	        					swap1(side1); swap1(side2); swap1(side3);
+	        					if (!side1.equals(side1t)) {
+	        						throw new RuntimeException("Hmm, side1 has changed");
+	        					}
+	        					if (!side2.equals(side2t)) {
+	        						throw new RuntimeException("Hmm, side2 has changed");
+	        					}
+	        					if (!side3.equals(side3t)) {
+	        						throw new RuntimeException("Hmm, side3 has changed");
+	        					}
+	        					
 	                        }
 	                    }
 	                }
