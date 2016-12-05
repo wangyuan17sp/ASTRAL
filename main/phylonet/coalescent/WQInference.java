@@ -372,7 +372,7 @@ public class WQInference extends AbstractInference<Tripartition> {
 		double effni = nd.effn + 0.0;
 		
 		if ( Math.abs((f1+f2+f3) - effni) > 0.01 ) {
-			//System.err.println("Adjusting effective N from\t" + effni + "\tto\t" + (f1 + f2 + f3) + ". This should only happen as a result of polytomies in gene trees.");
+//			System.err.println("Adjusting effective N from\t" + effni + "\tto\t" + (f1 + f2 + f3) + ". This should only happen as a result of polytomies in gene trees.");
 			effni = f1 + f2 + f3;
 		}
 		
@@ -501,6 +501,7 @@ public class WQInference extends AbstractInference<Tripartition> {
 		}
 		else if (this.options.getSumMethod() == 1 || this.options.getSumMethod() == 4) {
 			nodeDataList = ScoreOFESQuadripartitions(belowClusters1, belowCl1, belowClusters2, belowCl2, sisterClusters, sisterCl,  remainingClusters, remainingCl);
+			
 			if (nodeDataList.size()==0) {
 				throw new RuntimeException("Hmm, this shouldn't happen; "+nodeDataList);
 			}
@@ -527,7 +528,7 @@ public class WQInference extends AbstractInference<Tripartition> {
 			throw new RuntimeException("Hmm, bad summerization method option; "+this.options.getSumMethod());
 		}
 		
-		
+//		System.err.println("The size of nodeDataList is: " + nodeDataList.size());
 		STITreeCluster cluster = new STITreeCluster(belowCl1);
 		cluster.getBitSet().or(belowCl2.getBitSet());
 		STBipartition bmain = new STBipartition(cluster , cluster.complementaryCluster());
@@ -679,12 +680,12 @@ public class WQInference extends AbstractInference<Tripartition> {
 		criticalNd.quartcount /= (nodeDataList.size() + 0.0);
 		setLocalPP(criticalNd);
 		
-		
-		System.err.println("Here! The size of nodeDataList data size is " + nodeDataList.size() + 
-				" The main freq is " + criticalNd.mainfreq + " The alt1 freq is " + criticalNd.alt1freqs + " The alt2 freq is " + criticalNd.alt2freqs + 
-				" The effectiven is " + criticalNd.effn + " The posterior probability is " + criticalNd.postQ1.getPost());
-		
-		
+//		
+//		System.err.println("Here! The size of nodeDataList data size is " + nodeDataList.size() + 
+//				" The main freq is " + criticalNd.mainfreq + " The alt1 freq is " + criticalNd.alt1freqs + " The alt2 freq is " + criticalNd.alt2freqs + 
+//				" The effectiven is " + criticalNd.effn + " The posterior probability is " + criticalNd.postQ1.getPost());
+//		
+//		
 		
 		criticalNd.quads[0] = weightCalculator2.new Quadrapartition
 				(c1, c2, sister, remaining, true);
@@ -731,10 +732,10 @@ public class WQInference extends AbstractInference<Tripartition> {
 				}
 
 		} 
-		System.err.println("Here! The size of nodeDataList data size is " + nodeDataList.size() + 
-				" The main freq is " + criticalNd.mainfreq + " The alt1 freq is " + criticalNd.alt1freqs + " The alt2 freq is " + criticalNd.alt2freqs + 
-				" The effectiven is " + criticalNd.effn + " The posterior probability is " + criticalNd.postQ1.getPost());
-		
+//		System.err.println("Here! The size of nodeDataList data size is " + nodeDataList.size() + 
+//				" The main freq is " + criticalNd.mainfreq + " The alt1 freq is " + criticalNd.alt1freqs + " The alt2 freq is " + criticalNd.alt2freqs + 
+//				" The effectiven is " + criticalNd.effn + " The posterior probability is " + criticalNd.postQ1.getPost());
+//		
 		return criticalNd;
 	}
 
@@ -803,7 +804,6 @@ public class WQInference extends AbstractInference<Tripartition> {
 				}
 			}
 		}
-		
 		return nodeDataList;
 		
 	}
