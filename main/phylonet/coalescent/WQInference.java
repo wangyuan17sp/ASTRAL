@@ -883,7 +883,7 @@ public class WQInference extends AbstractInference<Tripartition> {
 				(c1,  remaining, c2, sister, false);
 		s = weightCalculator2.getWeight2(quad3);
 		nd.alt2freqs = (double) Math.round(s.qs * 1000000d) / 1000000d;
-		
+		System.err.println("The freqs are, mainfreq: "+nd.mainfreq + " alt1freq: " + nd.alt1freqs + " alt2freq: "+nd.alt2freqs);
 		//nd.alt2freqs = s.qs[1];
 		nd.effn = (double) s.effn;	
 		if (nd.mainfreq > nd.effn) {
