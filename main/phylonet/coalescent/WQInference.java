@@ -673,11 +673,11 @@ public class WQInference extends AbstractInference<Tripartition> {
 
 		} 
 		
-		criticalNd.mainfreq  /= (nodeDataList.size() + 0.0);
-		criticalNd.alt1freqs /= (nodeDataList.size() + 0.0);
-		criticalNd.alt2freqs /= (nodeDataList.size() + 0.0);
-		criticalNd.effn /= (nodeDataList.size() + 0.0);
-		criticalNd.quartcount /= (nodeDataList.size() + 0.0);
+		criticalNd.mainfreq  /= ((int) nodeDataList.size());
+		criticalNd.alt1freqs /= ((int) nodeDataList.size());
+		criticalNd.alt2freqs /= ((int) nodeDataList.size());
+		criticalNd.effn /= ((int) nodeDataList.size());
+		criticalNd.quartcount /= ((int) nodeDataList.size());
 		setLocalPP(criticalNd);
 		
 //		
