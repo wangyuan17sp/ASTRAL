@@ -871,21 +871,21 @@ public class WQInference extends AbstractInference<Tripartition> {
 		Results2 s = weightCalculator2.getWeight2(quad);
 		//Results s = weightCalculator2.getWeight(quad);
 		//nd.mainfreq = s.qs[0];
-		nd.mainfreq = s.qs;
+		nd.mainfreq = (double)Math.round(s.qs * 10000000d) / 10000000d;
 		
 		Quadrapartition quad2 = weightCalculator2.new Quadrapartition
 				(c1,  sister, c2, remaining, false);
 		s = weightCalculator2.getWeight2(quad2);
 		
-		nd.alt1freqs = s.qs;	
+		nd.alt1freqs = (double)Math.round(s.qs * 10000000d) / 10000000d;	
 		//nd.alt1freqs = s.qs[2];
 		Quadrapartition quad3 = weightCalculator2.new Quadrapartition
 				(c1,  remaining, c2, sister, false);
 		s = weightCalculator2.getWeight2(quad3);
-		nd.alt2freqs = s.qs;
+		nd.alt2freqs = (double)Math.round(s.qs * 10000000d) / 10000000d;
 		
 		//nd.alt2freqs = s.qs[1];
-		nd.effn = (double) s.effn + 0.0;	
+		nd.effn = (double)Math.round(s.qs * 10000000d) / 10000000d + 0.0;	
 		if (nd.mainfreq > nd.effn) {
 			throw new RuntimeException("Hmm, this shouldn't happen; effectiven is smaller than mainfreq " + 
 		nd.effn + " " + nd.mainfreq);
