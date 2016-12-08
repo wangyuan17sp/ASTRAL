@@ -871,19 +871,18 @@ public class WQInference extends AbstractInference<Tripartition> {
 		Results2 s = weightCalculator2.getWeight2(quad);
 		//Results s = weightCalculator2.getWeight(quad);
 		//nd.mainfreq = s.qs[0];
-		nd.mainfreq = (double) Math.round(s.qs * 1000000d) / 1000000d;
+		nd.mainfreq = s.qs;
 		
 		Quadrapartition quad2 = weightCalculator2.new Quadrapartition
 				(c1,  sister, c2, remaining, false);
 		s = weightCalculator2.getWeight2(quad2);
 		
-		nd.alt1freqs = (double) Math.round(s.qs * 1000000d) / 1000000d;	
+		nd.alt1freqs = s.qs;	
 		//nd.alt1freqs = s.qs[2];
 		Quadrapartition quad3 = weightCalculator2.new Quadrapartition
 				(c1,  remaining, c2, sister, false);
 		s = weightCalculator2.getWeight2(quad3);
-		nd.alt2freqs = (double) Math.round(s.qs * 1000000d) / 1000000d;
-		System.err.println("The freqs are, mainfreq: "+nd.mainfreq + " alt1freq: " + nd.alt1freqs + " alt2freq: "+nd.alt2freqs);
+		nd.alt2freqs = s.qs;
 		//nd.alt2freqs = s.qs[1];
 		nd.effn = (double) s.effn;	
 		if (nd.mainfreq > nd.effn) {
