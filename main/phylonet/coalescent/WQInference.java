@@ -885,7 +885,7 @@ public class WQInference extends AbstractInference<Tripartition> {
 		nd.alt2freqs = (double)Math.round(s.qs * 10000000d) / 10000000d;
 		
 		//nd.alt2freqs = s.qs[1];
-		nd.effn = (double)Math.round(s.qs * 10000000d) / 10000000d + 0.0;	
+		nd.effn = (double) s.effn;	
 		if (nd.mainfreq > nd.effn) {
 			throw new RuntimeException("Hmm, this shouldn't happen; effectiven is smaller than mainfreq " + 
 		nd.effn + " " + nd.mainfreq);
