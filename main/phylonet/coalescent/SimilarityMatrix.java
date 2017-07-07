@@ -103,7 +103,7 @@ public class SimilarityMatrix {
 	}
 
 	
-	/*private void updateQuartetDistanceForPair (Integer treeall, BitSet left,
+	private void updateQuartetDistanceForPair (Integer treeall, BitSet left,
 			BitSet right, float[][] matrix) {
 		long c = treeall - left.cardinality() - right.cardinality();
 		c = c*(c-1)/2;
@@ -113,7 +113,7 @@ public class SimilarityMatrix {
 				matrix[r][l] = matrix[l][r];
 			}
 		}
-	}*/
+	}
 	
 	private void updateQuartetDistanceTri (BitSet left, BitSet right, float[][] matrix, double d) {
 		for (int l = left.nextSetBit(0); l >= 0; l=left.nextSetBit(l+1)) {
@@ -163,6 +163,64 @@ public class SimilarityMatrix {
 		}
 	}
 	*/
+	
+	// 339023690, 11085
+	void pupulateByBranchDistance(List<Tree> geneTrees) {
+	    this.similarityMatrix = new float[n][n];
+	    int[][] pairNumMatrix = new int[n][n];
+	    
+	    for (Tree tree : geneTrees) {
+	        boolean[][] indicatorMatrix = new boolean[n][n];
+	        HashMap<Integer, Integer> distanceMap = new HashMap<Integer, Integer>();
+	        
+	        for (TNode node : tree.postTraverse()) {
+	            if (node.isLeaf()) {
+	                distanceMap.put(GlobalMaps.taxonIdentifier.taxonId(node.getName()), 0);
+	            } else {
+	                for (TNode cn1 : node.getLeaves()) {
+	                    for (TNode cn2 : node.getLeaves()) {
+	                        int cn1ID = GlobalMaps.taxonIdentifier.taxonId(cn1.getName());
+	                        int cn2ID = GlobalMaps.taxonIdentifier.taxonId(cn2.getName());
+	                        if (cn1ID == cn2ID || indicatorMatrix[cn1ID][cn2ID]) {
+	                            continue;
+	                        }
+	                        similarityMatrix[cn1ID][cn2ID] += distanceMap.get(cn1ID) + distanceMap.get(cn2ID) + 2;
+	                        indicatorMatrix[cn1ID][cn2ID] = true;
+	                        pairNumMatrix[cn1ID][cn2ID]++;
+	                    }
+	                }
+	                
+	                for (TNode cn : node.getLeaves()) {
+	                    int cnID = GlobalMaps.taxonIdentifier.taxonId(cn.getName());
+	                    distanceMap.put(cnID, distanceMap.get(cnID) + 1);
+	                }
+	            }
+	        }
+	    }
+	    
+	    for (int i = 0; i < n; i++) {
+	        for (int j = 0; j < n; j++) {
+	            if (i == j) {
+	                similarityMatrix[i][j] = 1;
+	            } else {
+	                if (pairNumMatrix[i][j] != 0) {
+	                    similarityMatrix[i][j] /= pairNumMatrix[i][j];
+	                    similarityMatrix[i][j] = n - similarityMatrix[i][j];
+	                    //                    similarityMatrix[i][j] /= geneTrees.size();
+	                } else {
+	                    similarityMatrix[i][j] = -1; 
+	                }
+	            }
+                System.err.print(similarityMatrix[i][j] + " ");         
+            }
+            System.err.println();
+//            similarityMatrix[i][i] = 1;
+        }
+	}
+	                           
+	            
+
+	// Tree and TNode are both in library phylonet.tree.model
 	void populateByQuartetDistance(List<STITreeCluster> treeAllClusters, List<Tree> geneTrees) {
 
 		this.similarityMatrix = new float[n][n];
@@ -264,7 +322,7 @@ public class SimilarityMatrix {
 			}
 			//System.err.println(Arrays.toString(similarityMatrix[i]));
 		}
-	}
+	} 
 	
 	SimilarityMatrix convertToSpeciesDistance(SpeciesMapper spm) {
 		float [][] STsimMatrix = new float[spm.getSpeciesCount()][spm.getSpeciesCount()];
@@ -279,6 +337,7 @@ public class SimilarityMatrix {
 				denum[stJ][stI] ++;
 			}
 		}
+		
 		for (int i = 0; i < spm.getSpeciesCount(); i++) {
 			for (int j = 0; j < spm.getSpeciesCount(); j++) {
 				STsimMatrix[i][j] = denum[i][j] == 0 ? 0 : 
@@ -298,7 +357,7 @@ public class SimilarityMatrix {
 	SimilarityMatrix getInducedMatrix(HashMap<String, Integer> randomSample) {
 		
 		int sampleSize = randomSample.size();
-		float[][] sampleSimMatrix = new float [sampleSize][sampleSize];
+		float[][] sampleSimMatrix = new float[sampleSize][sampleSize];
 		
 		for (Entry<String, Integer> row : randomSample.entrySet()) {
 			int rowI = GlobalMaps.taxonIdentifier.taxonId(row.getKey());
@@ -313,7 +372,6 @@ public class SimilarityMatrix {
 		return ret;
 	}
 
-	//TODO: generate iterable, not list
 	Iterable<BitSet> getQuadraticBitsets() {
 		List<BitSet> newBitSets = new ArrayList<BitSet>();
 		ArrayList<Integer> inds = new ArrayList<Integer> (n);

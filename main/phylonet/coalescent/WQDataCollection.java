@@ -395,7 +395,9 @@ public class WQDataCollection extends AbstractDataCollection<Tripartition> imple
 		System.err.println("Calculating quartet distance matrix (for completion of X)");
 		
 		this.similarityMatrix = new SimilarityMatrix(n);
-		this.similarityMatrix.populateByQuartetDistance(treeAllClusters, this.geneTrees);
+		this.similarityMatrix.pupulateByBranchDistance(this.geneTrees);
+		
+		//this.similarityMatrix.populateByQuartetDistance(treeAllClusters, this.geneTrees);
 		this.speciesSimilarityMatrix = this.similarityMatrix.convertToSpeciesDistance(spm);
 	}
 

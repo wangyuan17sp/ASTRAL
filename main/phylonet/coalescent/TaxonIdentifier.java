@@ -17,6 +17,7 @@ public class TaxonIdentifier {
     public void lock() {
         this.locked = true;
     }
+    
     public Integer taxonId(String name) {
         Integer a = nameToId.get(name);
         if (a ==  null){ 
