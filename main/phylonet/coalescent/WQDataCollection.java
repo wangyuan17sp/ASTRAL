@@ -386,6 +386,19 @@ public class WQDataCollection extends AbstractDataCollection<Tripartition> imple
 		System.err.println("Building set of clusters (X) from gene trees ");
 		addTreeBipartitionsToX( this.completedGeeneTrees);
 
+        List<STITreeCluster> upgma = new ArrayList<STITreeCluster>();
+        Iterable<STITreeCluster> upgma_it = upgma;
+        for(BitSet b : this.speciesSimilarityMatrix.UPGMA()){
+            STITreeCluster sti = new STITreeCluster(GlobalMaps.taxonNameMap.getSpeciesIdMapper().getSTTaxonIdentifier());
+            sti.setCluster(b);
+            upgma.add(sti);
+        }
+        Tree UPGMA = Utils.buildTreeFromClusters(upgma_it, GlobalMaps.taxonNameMap.getSpeciesIdMapper().getSTTaxonIdentifier());
+        
+		System.out.println(UPGMA.toNewick());
+		System.err.println();
+		java.lang.System.exit(0);
+		
 		System.err.println("Number of Default Clusters: " + clusters.getClusterCount());
 		
 	}
@@ -397,7 +410,7 @@ public class WQDataCollection extends AbstractDataCollection<Tripartition> imple
 		this.similarityMatrix = new SimilarityMatrix(n);
 		this.similarityMatrix.pupulateByBranchDistance(this.geneTrees);
 		
-		//this.similarityMatrix.populateByQuartetDistance(treeAllClusters, this.geneTrees);
+//		this.similarityMatrix.populateByQuartetDistance(treeAllClusters, this.geneTrees);
 		this.speciesSimilarityMatrix = this.similarityMatrix.convertToSpeciesDistance(spm);
 	}
 
