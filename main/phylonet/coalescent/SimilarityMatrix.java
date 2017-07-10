@@ -175,8 +175,47 @@ public class SimilarityMatrix {
 	        
 	        for (TNode node : tree.postTraverse()) {
 	            if (node.isLeaf()) {
+	                
+	                // Setup BitSet
+	                BitSet tmp = new BitSet(n);
+                    tmp.set(GlobalMaps.taxonIdentifier.taxonId(node.getName()));
+                    ((STINode)node).setData(tmp);
+                    
+                    // Update Map
 	                distanceMap.put(GlobalMaps.taxonIdentifier.taxonId(node.getName()), 0);
 	            } else {
+	                
+	                // Setup Bitset
+	                List<BitSet> children = new ArrayList<BitSet>();
+	                BitSet newbs = new BitSet(n);
+                    for (TNode cn: node.getChildren()) {
+                        BitSet c = (BitSet) ((STINode)cn).getData();
+                        children.add(c);
+                        newbs.or(c);
+                    }
+                    ((STINode)node).setData(newbs);
+	                
+	                // Update similarity matrix
+                    for (int i = 0; i < children.size() - 1; i++) {
+                        BitSet left = children.get(i);
+                        for (int j = i + 1; j < children.size(); j++) {
+                           BitSet right = children.get(j);
+                           for (int k = 0; k < left.length(); k++) {
+                               if (left.get(k)) {
+                                   for (int l = 0; l < right.length(); l++) {
+                                       if (right.get(l)) {
+                                           similarityMatrix[k][l] += distanceMap.get(k) + distanceMap.get(l) + 2;
+                                           similarityMatrix[l][k] = similarityMatrix[k][l];
+                                           pairNumMatrix[k][l] += 1;
+                                           pairNumMatrix[l][k] = pairNumMatrix[k][l];
+                                       }
+                                   }
+                               }
+                           }
+                        }
+                    }
+                    
+                    /*
 	                for (TNode cn1 : node.getLeaves()) {
 	                    for (TNode cn2 : node.getLeaves()) {
 	                        int cn1ID = GlobalMaps.taxonIdentifier.taxonId(cn1.getName());
@@ -186,22 +225,38 @@ public class SimilarityMatrix {
 	                        }
 	                        similarityMatrix[cn1ID][cn2ID] += distanceMap.get(cn1ID) + distanceMap.get(cn2ID) + 2;
 	                        indicatorMatrix[cn1ID][cn2ID] = true;
-	                        pairNumMatrix[cn1ID][cn2ID]++;
+	                        pairNumMatrix[cn1ID][cn2ID] += 1;
 	                    }
-	                }
+	                }*/
 	                
+	                
+                    for (int index = 0; index < newbs.length(); index++) {
+                        if (newbs.get(index)) {
+                            distanceMap.put(index, distanceMap.get(index) + 1);
+                        }
+                    }
+                    
+                   /*
 	                for (TNode cn : node.getLeaves()) {
 	                    int cnID = GlobalMaps.taxonIdentifier.taxonId(cn.getName());
 	                    distanceMap.put(cnID, distanceMap.get(cnID) + 1);
-	                }
+	                }*/
+	                
 	            }
 	        }
 	    }
 	    
+	    //System.err.print("         ");
+//	    for (int i = 0; i < n; i++) {
+//	        System.err.print(GlobalMaps.taxonIdentifier.getTaxonName(i) + "          ");
+//	    }
+//	    System.err.println();
+	    
 	    for (int i = 0; i < n; i++) {
+	        System.err.print(GlobalMaps.taxonIdentifier.getTaxonName(i) + " ");
 	        for (int j = 0; j < n; j++) {
 	            if (i == j) {
-	                similarityMatrix[i][j] = 1;
+	                similarityMatrix[i][j] = 0;
 	            } else {
 	                if (pairNumMatrix[i][j] != 0) {
 	                    similarityMatrix[i][j] /= pairNumMatrix[i][j];
@@ -214,11 +269,9 @@ public class SimilarityMatrix {
                 System.err.print(similarityMatrix[i][j] + " ");         
             }
             System.err.println();
-//            similarityMatrix[i][i] = 1;
         }
 	}
-	                           
-	            
+
 
 	// Tree and TNode are both in library phylonet.tree.model
 	void populateByQuartetDistance(List<STITreeCluster> treeAllClusters, List<Tree> geneTrees) {
@@ -309,6 +362,7 @@ public class SimilarityMatrix {
 			}
 			
 		}
+		
 		for (int i = 0; i < n; i++) {
 			for (int j = i; j < n; j++) {
 				if (denom[i][j] == 0)
