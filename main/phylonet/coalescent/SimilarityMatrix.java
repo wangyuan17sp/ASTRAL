@@ -23,6 +23,7 @@ import phylonet.util.BitSet;
 public class SimilarityMatrix {
 	
 	private float[][] similarityMatrix;
+//	private float[][] speciesSimilarityMatrix;
 	private List<TreeSet<Integer>> orderedTaxonBySimilarity;
 	private Integer n;
 	
@@ -243,12 +244,11 @@ public class SimilarityMatrix {
 	                }*/
 	                
 	            }
-	        }
+	        }	        
 	    }
 	    
-	    //System.err.print("         ");
 //	    for (int i = 0; i < n; i++) {
-//	        System.err.print(GlobalMaps.taxonIdentifier.getTaxonName(i) + "          ");
+//	        System.err.print(GlobalMaps.taxonIdentifier.getTaxonName(i) + " ");
 //	    }
 //	    System.err.println();
 	    
@@ -261,7 +261,7 @@ public class SimilarityMatrix {
 	                if (pairNumMatrix[i][j] != 0) {
 	                    similarityMatrix[i][j] /= pairNumMatrix[i][j];
 	                    similarityMatrix[i][j] = n - similarityMatrix[i][j];
-	                    //                    similarityMatrix[i][j] /= geneTrees.size();
+//                    similarityMatrix[i][j] /= geneTrees.size();
 	                } else {
 	                    similarityMatrix[i][j] = -1; 
 	                }
@@ -378,6 +378,139 @@ public class SimilarityMatrix {
 		}
 	} 
 	
+	// Not consider missing data, 11321
+	   SimilarityMatrix matricesByBranchDistance(List<Tree> geneTrees, SpeciesMapper spm) {
+	        this.similarityMatrix = new float[n][n];
+//	        float[][] geneSimilarityMatrix = new float[n][n];
+	        float[][] speciesSimilarityMatrix = new float[spm.getSpeciesCount()][spm.getSpeciesCount()];
+            int[][] pairNumMatrix = new int[n][n];
+	        
+	        for (Tree tree : geneTrees) {
+	            HashMap<Integer, Integer> distanceMap = new HashMap<Integer, Integer>();
+	            float[][] geneSimilarityMatrix = new float[n][n];
+	            	            
+	            for (TNode node : tree.postTraverse()) {
+	                if (node.isLeaf()) {
+	                    BitSet tmp = new BitSet(n);
+	                    tmp.set(GlobalMaps.taxonIdentifier.taxonId(node.getName()));
+	                    ((STINode)node).setData(tmp);
+	                    
+	                    distanceMap.put(GlobalMaps.taxonIdentifier.taxonId(node.getName()), 0);
+	                } else {
+	                    List<BitSet> children = new ArrayList<BitSet>();
+	                    BitSet newbs = new BitSet(n);
+	                    for (TNode cn: node.getChildren()) {
+	                        BitSet c = (BitSet) ((STINode)cn).getData();
+	                        children.add(c);
+	                        newbs.or(c);
+	                    }
+	                    ((STINode)node).setData(newbs);
+	                    
+	                    for (int i = 0; i < children.size() - 1; i++) {
+	                        BitSet left = children.get(i);
+	                        for (int j = i + 1; j < children.size(); j++) {
+	                           BitSet right = children.get(j);
+	                           for (int k = 0; k < left.length(); k++) {
+	                               if (left.get(k)) {
+	                                   for (int l = 0; l < right.length(); l++) {
+	                                       if (right.get(l)) {
+                                               geneSimilarityMatrix[k][l] = distanceMap.get(k) + distanceMap.get(l) + 2;
+                                               geneSimilarityMatrix[l][k] = geneSimilarityMatrix[k][l];
+	                                           this.similarityMatrix[k][l] += geneSimilarityMatrix[k][l];
+                                               this.similarityMatrix[l][k] = this.similarityMatrix[k][l];
+                                               pairNumMatrix[k][l] += 1;
+                                               pairNumMatrix[l][k] = pairNumMatrix[k][l];
+	                                           
+	                                       }
+	                                   }
+	                               }
+	                           }
+	                        }
+	                    }
+	                    for (int index = 0; index < newbs.length(); index++) {
+	                        if (newbs.get(index)) {
+	                            distanceMap.put(index, distanceMap.get(index) + 1);
+	                        }
+	                    }
+	                }
+	            }
+	            SimilarityMatrix tmp = convertToSpeciesDistance2(spm, geneSimilarityMatrix);
+	            for (int i = 0; i < spm.getSpeciesCount(); i++) {
+	                for (int j = i; j < spm.getSpeciesCount(); j++) {
+	                    speciesSimilarityMatrix[i][j] += tmp.similarityMatrix[i][j];
+	                    speciesSimilarityMatrix[j][i] = speciesSimilarityMatrix[i][j];
+	                }
+	            }
+	        }
+	        
+	        for (int i = 0; i < n; i++) {
+	            System.err.print(GlobalMaps.taxonIdentifier.getTaxonName(i) + " ");
+	            for (int j = 0; j < n; j++) {
+	                if (i == j) {
+	                    this.similarityMatrix[i][j] = 0;
+	                } else {
+	                    if (pairNumMatrix[i][j] != 0) {
+	                        this.similarityMatrix[i][j] /= pairNumMatrix[i][j];
+	                        this.similarityMatrix[i][j] = n - this.similarityMatrix[i][j];
+	                    } else {
+	                        this.similarityMatrix[i][j] = -1;
+	                    }
+	                } 
+	                System.err.print(similarityMatrix[i][j] + " ");
+	            }
+	            System.err.println();
+	        }
+	        
+	        for (int i = 0; i < spm.getSpeciesCount(); i++) {
+	            for (int j = 0; j < spm.getSpeciesCount(); j++) {
+	                if (i == j) {
+	                    speciesSimilarityMatrix[i][j] = 0;
+                    } else {
+                        if (pairNumMatrix[i][j] != 0) {
+                            speciesSimilarityMatrix[i][j] /= pairNumMatrix[i][j];
+                        } else {
+                            speciesSimilarityMatrix[i][j] = -1;
+                        }
+                    } 
+	            }
+	        }
+	        
+	        SimilarityMatrix ret = new SimilarityMatrix(speciesSimilarityMatrix.length);
+	        ret.similarityMatrix = speciesSimilarityMatrix;
+	        
+	        return ret;
+	    }
+	   
+	    SimilarityMatrix convertToSpeciesDistance2(SpeciesMapper spm, float[][] similarityMatrix) {
+	        float [][] STsimMatrix = new float[spm.getSpeciesCount()][spm.getSpeciesCount()];
+	        float[][] denum = new float[spm.getSpeciesCount()][spm.getSpeciesCount()];
+	        for (int i = 0; i < n; i++) {
+	            for (int j = i; j < n; j++) {
+	                int stI =  spm.getSpeciesIdForTaxon(i);
+	                int stJ =  spm.getSpeciesIdForTaxon(j);
+	                STsimMatrix[stI][stJ] += similarityMatrix[i][j]; 
+	                STsimMatrix[stJ][stI] = STsimMatrix[stI][stJ];
+	                denum[stI][stJ] ++;
+	                denum[stJ][stI] ++;
+	            }
+	        }
+	        
+	        for (int i = 0; i < spm.getSpeciesCount(); i++) {
+	            for (int j = 0; j < spm.getSpeciesCount(); j++) {
+	                STsimMatrix[i][j] = denum[i][j] == 0 ? -1 : 
+	                    STsimMatrix[i][j] / denum[i][j];
+	            }
+	            STsimMatrix[i][i] = 0;
+	            //System.err.println(Arrays.toString(this.distSTMatrix[i]));
+	        }
+	        
+	        SimilarityMatrix ret = new SimilarityMatrix(STsimMatrix.length);
+	        ret.similarityMatrix = STsimMatrix;
+	        
+	        return ret;
+	    }
+	   
+	
 	SimilarityMatrix convertToSpeciesDistance(SpeciesMapper spm) {
 		float [][] STsimMatrix = new float[spm.getSpeciesCount()][spm.getSpeciesCount()];
 		float[][] denum = new float[spm.getSpeciesCount()][spm.getSpeciesCount()];
@@ -393,13 +526,13 @@ public class SimilarityMatrix {
 		}
 		
 		for (int i = 0; i < spm.getSpeciesCount(); i++) {
-			for (int j = 0; j < spm.getSpeciesCount(); j++) {
-				STsimMatrix[i][j] = denum[i][j] == 0 ? 0 : 
-					STsimMatrix[i][j] / denum[i][j];
-			}
-			STsimMatrix[i][i] = 1;
-			//System.err.println(Arrays.toString(this.distSTMatrix[i]));
-		}
+            for (int j = 0; j < spm.getSpeciesCount(); j++) {
+                STsimMatrix[i][j] = denum[i][j] == 0 ? -1 : 
+                    STsimMatrix[i][j] / denum[i][j];
+            }
+            STsimMatrix[i][i] = 0;
+            //System.err.println(Arrays.toString(this.distSTMatrix[i]));
+        }
 		System.err.println("Species tree distances calculated ...");
 		
 		SimilarityMatrix ret = new SimilarityMatrix(STsimMatrix.length);

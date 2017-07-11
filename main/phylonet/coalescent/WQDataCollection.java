@@ -397,7 +397,7 @@ public class WQDataCollection extends AbstractDataCollection<Tripartition> imple
         
 		System.out.println(UPGMA.toNewick());
 		System.err.println();
-		java.lang.System.exit(0);
+//		java.lang.System.exit(0);
 		
 		System.err.println("Number of Default Clusters: " + clusters.getClusterCount());
 		
@@ -408,10 +408,11 @@ public class WQDataCollection extends AbstractDataCollection<Tripartition> imple
 		System.err.println("Calculating quartet distance matrix (for completion of X)");
 		
 		this.similarityMatrix = new SimilarityMatrix(n);
-		this.similarityMatrix.pupulateByBranchDistance(this.geneTrees);
+//		this.similarityMatrix.pupulateByBranchDistance(this.geneTrees);
 		
-//		this.similarityMatrix.populateByQuartetDistance(treeAllClusters, this.geneTrees);
-		this.speciesSimilarityMatrix = this.similarityMatrix.convertToSpeciesDistance(spm);
+		this.similarityMatrix.populateByQuartetDistance(treeAllClusters, this.geneTrees);
+//		this.speciesSimilarityMatrix = this.similarityMatrix.convertToSpeciesDistance(spm);
+		this.speciesSimilarityMatrix = this.similarityMatrix.matricesByBranchDistance(this.geneTrees, spm);
 	}
 
 

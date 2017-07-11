@@ -18,6 +18,7 @@ import phylonet.tree.model.sti.STITreeCluster;
 import phylonet.tree.model.sti.STITreeCluster.Vertex;
 import phylonet.tree.util.Collapse;
 
+
 /***
  * Type T corresponds to a tripartition in ASTRAL
  * @author smirarab
