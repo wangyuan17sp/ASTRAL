@@ -39,7 +39,7 @@ import com.martiansoftware.jsap.stringparsers.FileStringParser;
 
 public class CommandLine {
 
-    protected static String _versinon = "4.11.1-USTARupgma";
+    protected static String _versinon = "4.11.1-original";
 
 
     private static void exitWithErr(String extraMessage, SimpleJSAP jsap) {
