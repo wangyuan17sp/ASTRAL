@@ -1,7 +1,6 @@
 package phylonet.coalescent;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -29,6 +28,19 @@ public class SimilarityMatrix {
 	
 	public SimilarityMatrix(int n) {
 		this.n = n;
+	}
+	
+	public SimilarityMatrix(float[][] from) {
+		this.n = from.length;
+		this.similarityMatrix = from;
+	}
+	
+	public int getSize() {
+		return n;
+	}
+	
+	public float get(int i, int j) {
+		return this.similarityMatrix[i][j];
 	}
 	
 	int getBetterSideByFourPoint(int x, int a, int b, int c) {
@@ -103,7 +115,7 @@ public class SimilarityMatrix {
 		return closestId;
 	}
 
-	
+	/*
 	private void updateQuartetDistanceForPair (Integer treeall, BitSet left,
 			BitSet right, float[][] matrix) {
 		long c = treeall - left.cardinality() - right.cardinality();
@@ -115,8 +127,11 @@ public class SimilarityMatrix {
 			}
 		}
 	}
-	
-	private void updateQuartetDistanceTri (BitSet left, BitSet right, float[][] matrix, double d) {
+	*/
+	private void updateQuartetDistanceTri(BitSet left,
+			BitSet right, float[][] matrix,double d) {
+		if (d == 0)
+			return;
 		for (int l = left.nextSetBit(0); l >= 0; l=left.nextSetBit(l+1)) {
 			for (int r = right.nextSetBit(0); r >= 0; r=right.nextSetBit(r+1)) {
 				matrix[l][r] += d;
@@ -124,7 +139,6 @@ public class SimilarityMatrix {
 			}
 		}
 	}
-	
 	/*
 	void populateByQuartetDistance(List<STITreeCluster> treeAllClusters, SetWeightCalculator swc) {
 		this.similarityMatrix = new float[n][n];
@@ -314,7 +328,7 @@ public class SimilarityMatrix {
 
 	// Tree and TNode are both in library phylonet.tree.model
 	void populateByQuartetDistance(List<STITreeCluster> treeAllClusters, List<Tree> geneTrees) {
-
+		Deque<BitSet> stack = new ArrayDeque<BitSet>();
 		this.similarityMatrix = new float[n][n];
 		long [][] denom = new long [n][n];
 
@@ -346,6 +360,7 @@ public class SimilarityMatrix {
 			Integer treeall = treeallCL.getClusterSize();
 			
 			for (TNode node : tree.postTraverse()) {
+<<<<<<< HEAD
 				if (node.isLeaf()) { 
 					continue;
 				}
@@ -383,14 +398,56 @@ public class SimilarityMatrix {
 						long rcu = rc * (treeall - lc - rc);
 						long rcp = rc*(rc-1)/2;
 						double sim = (totalPairs - lcp - rcp) // the number of fully resolved quartets
-								+ (totalUnresolvedPairs - lcu - rcu) / 2.0 // we count partially resolved quartets
+								//+ (totalUnresolvedPairs - lcu - rcu) / 2.0 // we count partially resolved quartets
 								; 
 						updateQuartetDistanceTri( left, right, similarityMatrix, sim);
+=======
+				if (node.isLeaf()) {
+					//BitSet tmp = new BitSet(GlobalMaps.taxonIdentifier.taxonCount());
+					BitSet tmp = new BitSet(n);
+					tmp.set(GlobalMaps.taxonIdentifier.taxonId(node.getName()));
+					stack.push(tmp);
+				} else if (node.isRoot() && node.getChildCount() == 3){
+					BitSet left = stack.pop();
+					BitSet middle = stack.pop();
+					BitSet right = stack.pop();
+					updateQuartetDistanceForPair(treeall, left, right, similarityMatrix);
+					updateQuartetDistanceForPair(treeall, left, middle, similarityMatrix);
+					updateQuartetDistanceForPair(treeall, middle, right, similarityMatrix);
+				} else {
+					
+					BitSet others = (BitSet) treeallCL.getBitSet().clone();
+					BitSet newbs = new BitSet(n);
+					ArrayList<BitSet> children = new ArrayList<BitSet>();
+					for (int j = 0; j < node.getChildCount(); j++ ) {
+						BitSet c = stack.pop();
+						children.add(c);	
+						others.xor(c);
+						newbs.or(c);
+>>>>>>> refs/remotes/origin/multiind
 					}
+					 
+					children.add(others);
+
+					for (int j = 0; j < children.size(); j++ ) {
+						BitSet left = children.get(j);
+						for (int i = j+1; i < children.size(); i++ ) {
+							BitSet right = children.get(i);
+							//BitSet both = new BitSet(GlobalMaps.taxonIdentifier.taxonCount());
+							//both.or(left);
+							//both.or(right);
+							// middle = new BitSet(GlobalMaps.taxonIdentifier.taxonCount());
+							//middle.or(treeallCL.getBitSet());
+							//middle.andNot(both); 
+							updateQuartetDistanceForPair(treeall, left, right, similarityMatrix);
+							//updateQuartetDistanceForPair(treeall, left, middle, similarityMatrix);
+							//updateQuartetDistanceForPair(treeall, middle, right, similarityMatrix);
+						}
+					}
+					stack.push(newbs);
 				}
 			}
 
-			
 			BitSet all = treeallCL.getBitSet();
 			int c = all.cardinality() - 2;
 			for (int l = all.nextSetBit(0); l >= 0; l=all.nextSetBit(l+1)) {
@@ -608,17 +665,16 @@ public class SimilarityMatrix {
 		
 		return ret;
 	}
-	
-	SimilarityMatrix getInducedMatrix(HashMap<String, Integer> randomSample) {
+	SimilarityMatrix getInducedMatrix(HashMap<String, Integer> randomSample, TaxonIdentifier id) {
 		
 		int sampleSize = randomSample.size();
 		float[][] sampleSimMatrix = new float[sampleSize][sampleSize];
 		
 		for (Entry<String, Integer> row : randomSample.entrySet()) {
-			int rowI = GlobalMaps.taxonIdentifier.taxonId(row.getKey());
+			int rowI = id.taxonId(row.getKey());
 			int i = row.getValue();
 			for (Entry<String, Integer> col : randomSample.entrySet()) {
-				int colJ = GlobalMaps.taxonIdentifier.taxonId(col.getKey());
+				int colJ = id.taxonId(col.getKey());
 				sampleSimMatrix[i][col.getValue()] = this.similarityMatrix[rowI][colJ];
 			}
 		}
@@ -626,7 +682,31 @@ public class SimilarityMatrix {
 		ret.similarityMatrix = sampleSimMatrix;
 		return ret;
 	}
+	
+	/*
+	 * 
+	 * TODO check what is this
+	 */
 
+	SimilarityMatrix getInducedMatrix(List<Integer> sampleOrigIDs) {
+		
+		int sampleSize = sampleOrigIDs.size();
+		SimilarityMatrix ret = new SimilarityMatrix(sampleSize);
+		ret.similarityMatrix = new float [sampleSize][sampleSize];
+		
+		int i = 0;
+		for (Integer rowI : sampleOrigIDs) {
+			int j = 0;
+			for (Integer colJ : sampleOrigIDs) {
+				ret.similarityMatrix[i][j] = this.similarityMatrix[rowI][colJ];
+				j++;
+			}
+			i++;
+		}
+		return ret;
+	}
+	
+	//TODO: generate iterable, not list
 	Iterable<BitSet> getQuadraticBitsets() {
 		List<BitSet> newBitSets = new ArrayList<BitSet>();
 		ArrayList<Integer> inds = new ArrayList<Integer> (n);
@@ -690,6 +770,7 @@ public class SimilarityMatrix {
 			
 			final float[] is = new float[size];// this.similarityMatrix[i].clone();
 			BitSet bsI = bsList.get(i);
+
 			weights.add(bsI.cardinality());
 			sims.add(is);
 			
@@ -703,6 +784,7 @@ public class SimilarityMatrix {
 				}
 				for (int k = bsI.nextSetBit(0); k >= 0; k = bsI.nextSetBit(k + 1)) {
 					for (int l = bsJ.nextSetBit(0); l >= 0; l = bsJ.nextSetBit(l + 1)) {
+//						System.err.println("k :"+k+" l : "+l);
 						is[j] += this.similarityMatrix[k][l];
 						c++;
 					}
@@ -719,7 +801,7 @@ public class SimilarityMatrix {
 			indsBySim.add(sortColumn);
 		}
 		
-		return upgmaLoop(weights, internalBSList, indsBySim, sims, size);
+		return upgmaLoop(weights, internalBSList, indsBySim, sims, size,false);
 	}
 	
 	List<BitSet> UPGMA() {
@@ -742,11 +824,11 @@ public class SimilarityMatrix {
 			indsBySim.add(sortColumn);
 		}
 		
-		return upgmaLoop(weights, bsList, indsBySim, sims, n);
+		return upgmaLoop(weights, bsList, indsBySim, sims, n, false);
 	}
 
 	private List<BitSet> upgmaLoop(List<Integer> weights, List<BitSet> bsList,
-			List<TreeSet<Integer>> indsBySim, List<float[]> sims, int left) {
+			List<TreeSet<Integer>> indsBySim, List<float[]> sims, int left, boolean randomize) {
 		List<BitSet> ret = new ArrayList<BitSet>();
 		while ( left > 2) {
 			int closestI = -1;
@@ -756,7 +838,7 @@ public class SimilarityMatrix {
 				if (indsBySim.get(i) == null)
 					continue;
 				int j = indsBySim.get(i).first();
-				if (sims.get(i)[j] > bestHit) {
+				if (sims.get(i)[j] > bestHit || (randomize & sims.get(i)[i] == bestHit & GlobalMaps.random.nextBoolean())) {
 					bestHit = sims.get(i)[j];
 					closestI = i;
 					closestJ = j;

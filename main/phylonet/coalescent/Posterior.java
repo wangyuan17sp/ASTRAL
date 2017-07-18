@@ -1,6 +1,7 @@
 package phylonet.coalescent;
 
-import cern.jet.stat.*;
+import cern.jet.stat.Gamma;
+import cern.jet.stat.Probability;
 
 /***
  * Computes branch length and posterior support
@@ -102,8 +103,12 @@ public class Posterior extends cern.jet.math.Constants{
 		double x; 
 		x=Math.pow((f1-fThird),2)/fThird+Math.pow((f2-fThird),2)/fThird+Math.pow((f3-fThird),2)/fThird;
 		p = Probability.chiSquareComplemented(2,x);
-		if (fThird<10) {
-				throw new RuntimeException(MESSAGE + "\n" + f1 + " " + f2 + " " + f3 + " " + n + " " + p );
+		
+		System.err.println( f1 + " " + f2 + " " + f3 + " " + n + " " + p );
+		if (n<=15) {				
+				System.err.println("Not enough genes");
+				return -2;
+		} else {
 		}
 		
 		return p;

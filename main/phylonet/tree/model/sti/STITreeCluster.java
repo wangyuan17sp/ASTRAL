@@ -2,8 +2,10 @@ package phylonet.tree.model.sti;
 
 import phylonet.coalescent.GlobalMaps;
 import phylonet.coalescent.TaxonIdentifier;
+import phylonet.coalescent.IClusterCollection.VertexPair;
 import phylonet.util.BitSet;
 
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
@@ -18,6 +20,7 @@ public class STITreeCluster implements Iterable<Integer>
   //protected String[] _taxa;
   protected BitSet _cluster;
   private int hashCode = 0;
+  
   /**
    * This identifies the meaning of the biset set. 
    * Bit number x in the bitset corresponds to taxon with ID x. 
@@ -25,11 +28,11 @@ public class STITreeCluster implements Iterable<Integer>
   private TaxonIdentifier taxonIdentifier;
 
 
-  public STITreeCluster()
+/*  public STITreeCluster()
   {
     this.taxonIdentifier = GlobalMaps.taxonIdentifier;
     this._cluster = new BitSet(this.taxonIdentifier.taxonCount());
-  }
+  }*/
   
   public STITreeCluster(STITreeCluster tc)
   {
@@ -205,7 +208,7 @@ public class STITreeCluster implements Iterable<Integer>
   }
 
   public STITreeCluster complementaryCluster() {
-    STITreeCluster cc = new STITreeCluster();
+    STITreeCluster cc = new STITreeCluster(this.taxonIdentifier);
     BitSet bs = (BitSet)this._cluster.clone();
     bs.flip(0,this.taxonIdentifier.taxonCount());
 /*    for (int i = 0; i < this._taxa.length; i++) {
@@ -267,11 +270,14 @@ public class STITreeCluster implements Iterable<Integer>
 		//public int _el_num = -1;
 		//public int _min_cost = -1;
 		public double _max_score = Integer.MIN_VALUE;
+		public double _estimated = Integer.MIN_VALUE;
+		public double _upper_bound = Integer.MAX_VALUE;
 		public double _c = 0;
 		public Vertex _min_lc = this._min_rc = null;
 		public Vertex _min_rc;
 		public List<Vertex> _subcl = null;	 // Don't matter	
-		public byte _done = 0; // 0 for not, 1 for yes, 2 for failed
+		public byte _done = 0; // 0 for not, 1 for upper bound, 2 for estimated, 3 for yes
+		public ArrayList<VertexPair> clusterResolutions = null;
 		
 		public Vertex() {
 			super();

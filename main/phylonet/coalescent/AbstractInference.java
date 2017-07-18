@@ -47,6 +47,8 @@ public abstract class AbstractInference<T> {
 	protected Options options;
 	DecimalFormat df;
 	
+	double estimationFactor = 0;
+	
 	public AbstractInference(Options options, List<Tree> trees,
 			List<Tree> extraTrees) {
 		super();
@@ -199,6 +201,9 @@ public abstract class AbstractInference<T> {
 			//System.out.println(pe.getCluster().getClusterSize()+"\t"+pe._max_score);
 			// int k = sigmaNs/(stTaxa.length-1);
 
+			if ( pe.getCluster().getClusterSize()>2 && (pe._min_lc == null || pe._min_rc == null))
+				System.err.println("hmm; this shouldn't have happened: "+ pe);
+			
 			if (pe._min_rc != null) {
 				minVertices.push(pe._min_rc);
 			}
@@ -225,7 +230,7 @@ public abstract class AbstractInference<T> {
 			}
 			sol._st = tr;
 		} else {
-			sol._st = Utils.buildTreeFromClusters(minClusters, spm.getSTTaxonIdentifier());
+			sol._st = Utils.buildTreeFromClusters(minClusters, spm.getSTTaxonIdentifier(), false);
 		}
 
 		/* HashMap<TNode,BitSet> map = new HashMap<TNode,BitSet>();
@@ -258,7 +263,7 @@ public abstract class AbstractInference<T> {
 		Long cost = getTotalCost(all);
 		sol._totalCoals = cost;
 		solutions.add(sol);
-        System.err.println("Final optimization score: " + cost);
+        System.err.println("Optimization score: " + cost);
 
 		return (List<Solution>) (List<Solution>) solutions;
 	}
@@ -285,16 +290,12 @@ public abstract class AbstractInference<T> {
 		dataCollection = newCounter(newClusterCollection());
 		weightCalculator = newWeightCalculator();
 
-		// Compute bipartitions from the input gene trees
-		dataCollection.computeTreePartitions(this);
-
-		/***
-		 * Adds new bipartitions using heuristics
+		/**
+		 * Fors the set X by adding from gene trees and
+		 * by adding using ASTRAL-II hueristics
 		 */
-		if (this.getAddExtra() != 0) {
-		    System.err.println("calculating extra bipartitions to be added at level " + this.getAddExtra() +" ...");
-		    dataCollection.addExtraBipartitionByExtension(this);
-		}
+		dataCollection.formSetX(this);
+
 		
 		if (options.isExactSolution()) {
 	          System.err.println("calculating all possible bipartitions ...");
@@ -389,10 +390,6 @@ public abstract class AbstractInference<T> {
 		return this.options.getBranchannotation();
 	}
 
-	public boolean shouldOutputCompleted() {
-		
-		return options.isOutputCompletedGenes();
-	}
 
 	public void setDLbdWeigth(double d) {
 		options.setDLbdWeigth(d);
