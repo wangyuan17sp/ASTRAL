@@ -231,12 +231,20 @@ public class SpeciesMapper {
 				denum[stJ][stI] ++;
 			}
 		}
+//		System.out.println(this.getSpeciesCount());
 		for (int i = 0; i < this.getSpeciesCount(); i++) {
+//		    System.out.print(this.getSpeciesName(i) + " ");
 			for (int j = 0; j < this.getSpeciesCount(); j++) {
-				STsimMatrix[i][j] = denum[i][j] == 0 ? 0 : 
-					STsimMatrix[i][j] / denum[i][j];
+			    if (i == j) {
+			        STsimMatrix[i][j] = 0;
+			    } else {
+			        STsimMatrix[i][j] = denum[i][j] == 0 ? -99 : 
+			            STsimMatrix[i][j] / denum[i][j];
+			    }
+//			    System.out.print(STsimMatrix[i][j] + " ");
 			}
-			STsimMatrix[i][i] = 1;
+//			System.out.println();
+//			STsimMatrix[i][i] = 1;
 			//System.err.println(Arrays.toString(this.distSTMatrix[i]));
 		}
 		System.err.println("Species tree distances calculated ...");

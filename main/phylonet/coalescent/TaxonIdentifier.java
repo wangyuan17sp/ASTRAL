@@ -23,15 +23,12 @@ public class TaxonIdentifier {
     public void lock() {
         this.locked = true;
     }
-<<<<<<< HEAD
     
-=======
     /**
      * Returns the ID corresponding to the taxon name , if the taxon name is new it adds it unless the taxonidentifier is locked
      * @param name
      * @return
      */
->>>>>>> upstream/astral3
     public Integer taxonId(String name) {
         Integer a = nameToId.get(name);
         if (a ==  null){ 
