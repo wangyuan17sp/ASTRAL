@@ -17,6 +17,7 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map.Entry;
+import java.util.Random;
 import java.util.TreeSet;
 
 import phylonet.tree.io.NewickReader;
@@ -214,9 +215,9 @@ public class SimilarityMatrix {
             }	        
         }
 
-        System.out.println(GlobalMaps.taxonIdentifier.taxonCount());
+//        System.out.println(GlobalMaps.taxonIdentifier.taxonCount());
         for (int i = 0; i < n; i++) {
-            System.out.print(GlobalMaps.taxonIdentifier.getTaxonName(i) + " ");
+//            System.out.print(GlobalMaps.taxonIdentifier.getTaxonName(i) + " ");
             for (int j = 0; j < n; j++) {
                 if (i == j) {
                     similarityMatrix[i][j] = 0;
@@ -228,9 +229,9 @@ public class SimilarityMatrix {
                         similarityMatrix[i][j] = -99; 
                     }
                 }
-                System.out.print(similarityMatrix[i][j] + " ");         
+//                System.out.print(similarityMatrix[i][j] + " ");         
             }
-            System.out.println();
+//            System.out.println();
         }
     }
 
@@ -270,7 +271,6 @@ public class SimilarityMatrix {
 
 
         for (int i = 0; i < n; i++) {
-            System.err.print(GlobalMaps.taxonIdentifier.getTaxonName(i) + " ");
             for (int j = 0; j < n; j++) {
                 if (i == j) {
                     similarityMatrix[i][j] = 0;
@@ -281,10 +281,8 @@ public class SimilarityMatrix {
                     } else {
                         similarityMatrix[i][j] = -1; 
                     }
-                }
-                System.err.print(similarityMatrix[i][j] + " ");         
+                }       
             }
-            System.err.println();
         }
     }
 
@@ -430,14 +428,14 @@ public class SimilarityMatrix {
                                 if (left.get(k)) {
                                     for (int l = 0; l < right.length(); l++) {
                                         if (right.get(l)) {
-                                            geneDissimilarityM[k][l] = distanceMap.get(k) + distanceMap.get(l) + 2;
-                                            geneDissimilarityM[l][k] = geneDissimilarityM[k][l];
-                                            this.similarityMatrix[k][l] += geneDissimilarityM[k][l];
+                                            geneSimilarityMatrix[k][l] = distanceMap.get(k) + distanceMap.get(l) + 2;
+                                            geneSimilarityMatrix[l][k] = geneSimilarityMatrix[k][l];
+                                            this.similarityMatrix[k][l] += geneSimilarityMatrix[k][l];
                                             this.similarityMatrix[l][k] = this.similarityMatrix[k][l];
                                             pairNumMatrix[k][l] += 1;
                                             pairNumMatrix[l][k] = pairNumMatrix[k][l];
-                                            geneSimilarityMatrix[k][l] = n - geneDissimilarityM[k][l];
-                                            geneSimilarityMatrix[l][k] = geneSimilarityMatrix[k][l];
+//                                            geneSimilarityMatrix[k][l] = n - geneDissimilarityM[k][l];
+//                                            geneSimilarityMatrix[l][k] = geneSimilarityMatrix[k][l];
                                         }
                                     }
                                 }
@@ -453,13 +451,13 @@ public class SimilarityMatrix {
             }
            
             SimilarityMatrix tmp = convertToSpeciesDistance2(spm, geneSimilarityMatrix);
-            SimilarityMatrix speciesDM = convertToSpeciesDistance2(spm, geneDissimilarityM);
+//            SimilarityMatrix speciesDM = convertToSpeciesDistance2(spm, geneDissimilarityM);
             for (int i = 0; i < spm.getSpeciesCount(); i++) {
                 for (int j = i; j < spm.getSpeciesCount(); j++) {
                     speciesSimilarityMatrix[i][j] += tmp.similarityMatrix[i][j];
                     speciesSimilarityMatrix[j][i] = speciesSimilarityMatrix[i][j];
-                    speciesDistanceMatrix[i][j] += speciesDM.similarityMatrix[i][j];
-                    speciesDistanceMatrix[j][i] = speciesDistanceMatrix[i][j];
+//                    speciesDistanceMatrix[i][j] += speciesDM.similarityMatrix[i][j];
+//                    speciesDistanceMatrix[j][i] = speciesDistanceMatrix[i][j];
                 }
             }
         }
@@ -493,13 +491,14 @@ public class SimilarityMatrix {
                 } else {
                     if (pairNumMatrix[i][j] != 0) {
                         speciesSimilarityMatrix[i][j] /= pairNumMatrix[i][j];
-                        speciesDistanceMatrix[i][j] /= pairNumMatrix[i][j];
+                        speciesDistanceMatrix[i][j] = speciesSimilarityMatrix[i][j];
+                        speciesSimilarityMatrix[i][j] = spm.getSpeciesCount() - speciesSimilarityMatrix[i][j];
                     } else {
                         speciesSimilarityMatrix[i][j] = -99;
                         speciesDistanceMatrix[i][j] = -99;
                     }
                 } 
-//                System.out.print(speciesDistanceMatrix[i][j] + " ");
+//                System.out.print(speciesSimilarityMatrix[i][j] + " ");
             }
 //            System.out.println();
         }
@@ -585,6 +584,15 @@ public class SimilarityMatrix {
         }
         SimilarityMatrix ret = new SimilarityMatrix(sampleSize);
         ret.similarityMatrix = sampleSimMatrix;
+        float[][] distanceM = new float[sampleSize][sampleSize];
+        for (int i = 0; i < sampleSimMatrix.length; i++) {
+            for (int j = 0; j < sampleSimMatrix.length; j++) {
+                if (i == j) {distanceM[i][j] = 0; }
+                else if (sampleSimMatrix[i][j] == -99.0) { distanceM[i][j] = -99; }
+                else { distanceM[i][j] = sampleSimMatrix[i][j]; }
+            }
+        }
+        ret.speciesDM = distanceM;
         return ret;
     }
 
@@ -689,7 +697,7 @@ public class SimilarityMatrix {
                 }
                 for (int k = bsI.nextSetBit(0); k >= 0; k = bsI.nextSetBit(k + 1)) {
                     for (int l = bsJ.nextSetBit(0); l >= 0; l = bsJ.nextSetBit(l + 1)) {
-                        //						System.err.println("k :"+k+" l : "+l);
+//						System.err.println("k :"+k+" l : "+l);
                         is[j] += this.similarityMatrix[k][l];
                         c++;
                     }
@@ -709,60 +717,115 @@ public class SimilarityMatrix {
         return upgmaLoop(weights, internalBSList, indsBySim, sims, size, false);
     }
     
-    List<BitSet> PhyDstar(SpeciesMapper spm) {
-        /* Write the distance matrix to a file,
-         *   then use the file as input for PhyD*.
-         *   Call PhyD* to construct a tree. */
+    List<BitSet> resolveByPhyDstar(List<BitSet> bsList, boolean original) {
+        int size = bsList.size();
+        float[][] internalMatrix = new float[size][size];
+        HashMap<Integer, BitSet> bitMap = new HashMap<Integer, BitSet>(size);
+//        TaxonIdentifier ti = new TaxonIdentifier();
+        
+        for (int i = 0; i < size; i++) {
+            bitMap.put(i, bsList.get(i));
+            BitSet bsI = bsList.get(i);  
+            Random rand = new Random();
+            for (int j = 0; j < size; j++) {
+                BitSet bsJ = bsList.get(j);
+                float min = n;
+                if (i == j) {
+                    internalMatrix[i][j] = 0;
+                    continue;
+                }
+                for (int k = bsI.nextSetBit(0); k >= 0; k = bsI.nextSetBit(k + 1)) {
+                    for (int l = bsJ.nextSetBit(0); l >= 0; l = bsJ.nextSetBit(l + 1)) {
+                        if (this.speciesDM[k][l] < min) {
+                            min = this.speciesDM[k][l];
+                        }
+//                        internalMatrix[i][j] += this.speciesDM[k][l];
+//                        c++;
+                    }
+                }
+                if (min <= 0) { throw new RuntimeException("Error: " + bsI + " " + bsJ); }
+//                internalMatrix[i][j] /= c;
+                internalMatrix[i][j] = min;
+            }
+        }
+        
         File matrix;
         try {
-            matrix = new File("tmp.matrix");
+            matrix = new File("internal.matrix");
+//            matrix = File.createTempFile("tmp", ".txt");
             BufferedWriter out = new BufferedWriter(new FileWriter(matrix));
-
-            out.write(spm.getSpeciesCount() + "\n");
-            System.out.println(spm.getSpeciesCount() + "\n");
-            for (int i = 0; i < spm.getSpeciesCount(); i++) {
-                out.write(spm.getSpeciesName(i) + " ");
-                System.out.print(spm.getSpeciesName(i) + " ");
-                for (int j = 0; j < spm.getSpeciesCount(); j++) {
-                    out.write(this.speciesDM[i][j] + " ");
-                    System.out.print(this.speciesDM[i][j] + " ");
+            out.write(size + "\n");
+            for (int i = 0; i < size; i++) {
+                out.write(i + " ");
+                for (int j = 0; j < size; j++) {
+                    out.write(internalMatrix[i][j] + " ");
                 }
-                System.out.println();
                 out.write("\n");
             }
             out.close();
-            String[] arg = new String[]{"java","-jar", "PhyDstar.java","-i","tmp.matrix"};
+            
+            String[] arg = new String[]{"java","-jar","PhyDstar.java","-i",matrix.getName()};
             PhyDstar.main(arg);
         } catch (IOException e) { throw new RuntimeException(); }
         
-        /* Write the PhyD* tree back into ASTRAL */
-        String newick;
-        try {
-            File phyDtree = new File("tmp.matrix_bionj.t");
-            BufferedReader in = new BufferedReader(new FileReader(phyDtree));
-            newick = in.readLine();
-            System.out.println(newick);
-            in.close();
-            matrix.delete();
-            phyDtree.delete(); 
-        } catch (IOException e) { throw new RuntimeException("Cannot find file: " + e); }
-        
-        /* Read the newick tree as an actual tree */
-        Tree phyDtree = null;
+        Tree phyDtree = generatePhyDstarTree(matrix);
         List<BitSet> ret = new ArrayList<BitSet>();
-        try {
-            if (newick.length() > 0) {
-                newick = newick.replaceAll("\\)[^,);]*", ")");
-                NewickReader nr = new NewickReader(new StringReader(newick));
-                phyDtree = nr.readTree();
-                System.out.println(phyDtree.toNewick());
+        
+        /* Extract list of BitSets of leaf-sets */
+        for (TNode node : phyDtree.postTraverse()) {
+            if (node.isRoot() ) {
+                continue;
+            } else if (node.isLeaf()) {
+                if (original) {
+                    BitSet leaf = bitMap.get(Integer.parseInt(node.getName()));
+                    ((STINode)node).setData(leaf);
+                } else {
+                    BitSet leaf = new BitSet(size);
+                    leaf.set(Integer.parseInt(node.getName()));
+                    ((STINode)node).setData(leaf);
+                }
+//                System.out.println("Leaf: " + leaf + " " + node.getName());
+            } else {
+                BitSet newbs = new BitSet(n);
+                for (TNode cn : node.getChildren()) {
+                    BitSet c = (BitSet) ((STINode)cn).getData();
+//                    System.out.println("Children: " + c + " " + cn.getName());
+                    newbs.or(c);
+                }
+                ((STINode)node).setData(newbs);
+                ret.add(newbs);
             }
-        } catch (ParseException e) {
-            throw new RuntimeException("Failed to Parse Tree: " , e);
-        } catch (IOException e) {
-            throw new RuntimeException();
         }
-
+//        System.out.println(ret);
+        return ret;
+    }
+    
+    List<BitSet> PhyDstar(SpeciesMapper spm) {
+        /* Write the distance matrix to a file, then use the file as input for PhyD*.
+         * Call PhyD* to construct a tree. */
+        File matrix;
+        try {
+            matrix = new File("distance.matrix");
+//            matrix = File.createTempFile("matrix", ".txt");
+            BufferedWriter out = new BufferedWriter(new FileWriter(matrix));
+//            File.createTempFile(prefix, suffix)
+            out.write(this.speciesDM.length + "\n");
+            for (int i = 0; i < this.speciesDM.length; i++) {
+                out.write(spm.getSpeciesName(i) + " ");
+                for (int j = 0; j < this.speciesDM.length; j++) {
+                    out.write(this.speciesDM[i][j] + " ");
+                }
+                out.write("\n");
+            }
+            out.close();
+            String[] arg = new String[]{"java","-jar","PhyDstar.java","-i",matrix.getName()};
+            PhyDstar.main(arg);
+        } catch (IOException e) { throw new RuntimeException(); }
+        
+        Tree phyDtree = generatePhyDstarTree(matrix);
+        
+        List<BitSet> ret = new ArrayList<BitSet>();
+        /* Extract list of BitSets of leaf-sets */
         for (TNode node : phyDtree.postTraverse()) {
             if (node.isRoot()) {
                 continue;
@@ -770,22 +833,49 @@ public class SimilarityMatrix {
                 BitSet leaf = new BitSet(n);
                 leaf.set(GlobalMaps.taxonIdentifier.taxonId(node.getName()));
                 ((STINode)node).setData(leaf);
-                System.out.println("Leaf: " + leaf + " " + node.getName());
             } else {
                 BitSet newbs = new BitSet(n);
                 for (TNode cn : node.getChildren()) {
                     BitSet c = (BitSet) ((STINode)cn).getData();
-                    System.out.println("Children: " + c + " " + cn.getName());
                     newbs.or(c);
                 }
                 ((STINode)node).setData(newbs);
                 ret.add(newbs);
             }
         }
-        System.out.println(ret);
         return ret;
     }
 
+    Tree generatePhyDstarTree(File matrix) {
+        
+        /* Write PhyD* tree back into ASTRAL */
+        String newick;
+        try {
+            File phyDtree = new File(matrix.getName() + "_bionj.t");
+            BufferedReader in = new BufferedReader(new FileReader(phyDtree));
+            newick = in.readLine();
+            in.close();
+            matrix.delete();
+            phyDtree.delete(); 
+        } catch (IOException e) { throw new RuntimeException("Cannot find file: " + e); }
+        
+        /* Read the newick tree as an actual tree */
+        Tree phyDstar_t = null;
+        
+        try {
+            if (newick.length() > 0) {
+                newick = newick.replaceAll("\\)[^,);]*", ")");
+                NewickReader nr = new NewickReader(new StringReader(newick));
+                phyDstar_t = nr.readTree();
+            }
+        } catch (ParseException e) {
+            throw new RuntimeException("Failed to Parse Tree: " , e);
+        } catch (IOException e) {
+            throw new RuntimeException();
+        }
+        return phyDstar_t;
+    }
+    
     List<BitSet> UPGMA() {
 
         List<BitSet> bsList = new ArrayList<BitSet>(n);
@@ -812,6 +902,7 @@ public class SimilarityMatrix {
 
     private List<BitSet> upgmaLoop(List<Integer> weights, List<BitSet> bsList,
             List<TreeSet<Integer>> indsBySim, List<float[]> sims, int left, boolean randomize) {
+        
         List<BitSet> ret = new ArrayList<BitSet>();
         while ( left > 2) {
             int closestI = -1;

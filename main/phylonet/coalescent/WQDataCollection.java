@@ -678,22 +678,22 @@ public class WQDataCollection extends AbstractDataCollection<Tripartition>
 
 		ArrayList<Tree> baseTrees = new ArrayList<Tree>();
 		List<STITreeCluster> upgma = new ArrayList<STITreeCluster>();
-		List<STITreeCluster> phyDstar = new ArrayList<STITreeCluster>();
-		for(BitSet b : this.speciesSimilarityMatrix.UPGMA()){
-			STITreeCluster sti = new STITreeCluster(GlobalMaps.taxonNameMap.getSpeciesIdMapper().getSTTaxonIdentifier());
-			sti.setCluster(b);
-			upgma.add(sti);
-		}
+//		List<STITreeCluster> phyDstar = new ArrayList<STITreeCluster>();
+//		for(BitSet b : this.speciesSimilarityMatrix.UPGMA()){
+//			STITreeCluster sti = new STITreeCluster(GlobalMaps.taxonNameMap.getSpeciesIdMapper().getSTTaxonIdentifier());
+//			sti.setCluster(b);
+//			upgma.add(sti);
+//		}
 		for(BitSet b : this.speciesSimilarityMatrix.PhyDstar(GlobalMaps.taxonNameMap.getSpeciesIdMapper())){
             STITreeCluster sti = new STITreeCluster(GlobalMaps.taxonNameMap.getSpeciesIdMapper().getSTTaxonIdentifier());
             sti.setCluster(b);
-            phyDstar.add(sti);
+            upgma.add(sti);
         }
 		Tree UPGMA = Utils.buildTreeFromClusters(upgma, GlobalMaps.taxonNameMap.getSpeciesIdMapper().getSTTaxonIdentifier(), false);
-		Tree PhyDstar = Utils.buildTreeFromClusters(phyDstar, GlobalMaps.taxonNameMap.getSpeciesIdMapper().getSTTaxonIdentifier(), false);
-		System.out.println(PhyDstar.toNewick());
+//		Tree PhyDstar = Utils.buildTreeFromClusters(phyDstar, GlobalMaps.taxonNameMap.getSpeciesIdMapper().getSTTaxonIdentifier(), false);
+		System.out.println(UPGMA.toNewick());
 //        System.err.println();
-        java.lang.System.exit(0);
+//        java.lang.System.exit(0);
 		
 		///		Tree allGenesGreedy = Utils.greedyConsensus(greedyCandidates, false,
 //				GlobalMaps.taxonNameMap.getSpeciesIdMapper()
@@ -889,11 +889,12 @@ public class WQDataCollection extends AbstractDataCollection<Tripartition>
 	 */
 	public void addExtraBipartitionByDistance() {
 
-		for (BitSet bs : speciesSimilarityMatrix.UPGMA()) {
-			STITreeCluster g = GlobalMaps.taxonNameMap.getSpeciesIdMapper()
-					.getGeneClusterForSTCluster(bs);
-			this.addCompletedSpeciesFixedBipartionToX(g,
-					g.complementaryCluster());
+//		for (BitSet bs : speciesSimilarityMatrix.UPGMA()) {
+	    for (BitSet bs : speciesSimilarityMatrix.PhyDstar(GlobalMaps.taxonNameMap.getSpeciesIdMapper())) {
+	        STITreeCluster g = GlobalMaps.taxonNameMap.getSpeciesIdMapper()
+	                .getGeneClusterForSTCluster(bs);
+	        this.addCompletedSpeciesFixedBipartionToX(g,
+	                g.complementaryCluster());
 			// upgmac.add(g);
 		}
 		;
@@ -1033,15 +1034,18 @@ public class WQDataCollection extends AbstractDataCollection<Tripartition>
 				comp.flip(0, tid.taxonCount());
 				childbs[i1] = comp;
 
-				System.err.print("polytomy of size "
-						+ greedyNode.getChildCount());
+				System.err.print("polytomy of size " + greedyNode.getChildCount());
 
 				// First resolve the polytomy using UPGMA.
 				// this.resolveByUPGMA(childbs, tid ,
 				// this.speciesSimilarityMatrix);
+				
+//				this.addSubSampledBitSetToX(
+//						this.speciesSimilarityMatrix.resolveByUPGMA(
+//								Arrays.asList(childbs), true), tid);
 				this.addSubSampledBitSetToX(
-						this.speciesSimilarityMatrix.resolveByUPGMA(
-								Arrays.asList(childbs), true), tid);
+                        this.speciesSimilarityMatrix.resolveByPhyDstar(
+                                Arrays.asList(childbs), true), tid);
 
 				// Resolve by subsampling the greedy.
 				// Don't get confused. We are not subsampling species
@@ -1298,8 +1302,11 @@ public class WQDataCollection extends AbstractDataCollection<Tripartition>
 		SimilarityMatrix sampleSimMatrix = sm.getInducedMatrix(randomSample,
 				tid);
 
+//		added |= this.addDoubleSubSampledBitSetToX(polytomyBSList,
+//				sampleSimMatrix.UPGMA(), tid);
 		added |= this.addDoubleSubSampledBitSetToX(polytomyBSList,
-				sampleSimMatrix.UPGMA(), tid);
+                sampleSimMatrix.PhyDstar(GlobalMaps.taxonNameMap.getSpeciesIdMapper()), tid);
+		
 
 		if (quartetAddition) {
 			added |= this.addDoubleSubSampledBitSetToX(polytomyBSList,
