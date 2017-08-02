@@ -117,6 +117,7 @@ public abstract class AbstractComputeMinCostTask<T> {
 			v._max_score = 0;
 			
 			v._min_lc = (v._min_rc = null);
+			
 			v._done = 3;
 			
 			return v._max_score;
@@ -191,6 +192,8 @@ public abstract class AbstractComputeMinCostTask<T> {
 			v._min_rc = bigv;
 			v._c = bi.weight;
 		}
+		
+		v.clusterResolutions = null;
 		v._done = 3;
 		return v._max_score;
 	}

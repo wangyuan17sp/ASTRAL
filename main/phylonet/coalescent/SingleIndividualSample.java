@@ -30,7 +30,7 @@ public class SingleIndividualSample {
 	 * taxon identifer will only include the individuals sampled. 
 	 */
 	//private TaxonIdentifier sampleSpecificTaxonIdentifier;
-	// TODO: maybe we should take the distanc matrix out of this class.
+	// TODO: maybe we should take the distance matrix out of this class.
 	//       not sure why it's here. 
 	private SimilarityMatrix similarityMatrix;
 	/**
