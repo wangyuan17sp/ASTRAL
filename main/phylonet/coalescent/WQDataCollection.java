@@ -59,6 +59,8 @@ public class WQDataCollection extends AbstractDataCollection<Tripartition>
 	 * Similarity matrices for species. Used for setting up set X
 	 */
 	SimilarityMatrix speciesSimilarityMatrix;
+	
+	DistanceMatrix speciesDistanceMatrix;
 
 	// Parameters of ASTRAL-II heuristics
 	private boolean SLOW = false;
@@ -678,33 +680,38 @@ public class WQDataCollection extends AbstractDataCollection<Tripartition>
 //		}
 
 		ArrayList<Tree> baseTrees = new ArrayList<Tree>();
-		List<STITreeCluster> upgma = new ArrayList<STITreeCluster>();
-		for(BitSet b : this.speciesSimilarityMatrix.UPGMA()){
-			STITreeCluster sti = new STITreeCluster(GlobalMaps.taxonNameMap.getSpeciesIdMapper().getSTTaxonIdentifier());
-			sti.setCluster(b);
-			upgma.add(sti);
-		}
-//		for(BitSet b : this.speciesSimilarityMatrix.convertToDistanceMatrix().PhyDstar(GlobalMaps.taxonNameMap.getSpeciesIdMapper())){
-//            STITreeCluster sti = new STITreeCluster(GlobalMaps.taxonNameMap.getSpeciesIdMapper().getSTTaxonIdentifier());
-//            sti.setCluster(b);
-//            upgma.add(sti);
-//        }
-		Tree UPGMA = Utils.buildTreeFromClusters(upgma, GlobalMaps.taxonNameMap.getSpeciesIdMapper().getSTTaxonIdentifier(), false);
-//		Tree PhyDstar = Utils.buildTreeFromClusters(phyDstar, GlobalMaps.taxonNameMap.getSpeciesIdMapper().getSTTaxonIdentifier(), false);
-//		System.out.println(UPGMA.toNewick());
-//        System.err.println();
-//        java.lang.System.exit(0);
+		List<STITreeCluster> STls = new ArrayList<STITreeCluster>();
 		
-		///		Tree allGenesGreedy = Utils.greedyConsensus(greedyCandidates, false,
-//				GlobalMaps.taxonNameMap.getSpeciesIdMapper()
-//						.getSTTaxonIdentifier(), true);
-////		resolveByUPGMA((MutableTree) allGenesGreedy, GlobalMaps.taxonNameMap.getSpeciesIdMapper().getSTTaxonIdentifier(),
-//				this.speciesSimilarityMatrix);
+		if (options.isUstarDist()) {
+		    for(BitSet b : this.speciesDistanceMatrix.PhyDstar(GlobalMaps.taxonNameMap.getSpeciesIdMapper())){
+		        STITreeCluster sti = new STITreeCluster(GlobalMaps.taxonNameMap.getSpeciesIdMapper().getSTTaxonIdentifier());
+		        sti.setCluster(b);
+		        STls.add(sti);
+		    }
+		} else {
+		    for(BitSet b : this.speciesSimilarityMatrix.UPGMA()){
+		        STITreeCluster sti = new STITreeCluster(GlobalMaps.taxonNameMap.getSpeciesIdMapper().getSTTaxonIdentifier());
+		        sti.setCluster(b);
+		        STls.add(sti);
+		    }
+		}
+		
+		Tree ST = Utils.buildTreeFromClusters(STls, GlobalMaps.taxonNameMap.getSpeciesIdMapper().getSTTaxonIdentifier(), false);
+		//		Tree PhyDstar = Utils.buildTreeFromClusters(phyDstar, GlobalMaps.taxonNameMap.getSpeciesIdMapper().getSTTaxonIdentifier(), false);
+		//		System.out.println(UPGMA.toNewick());
+		//        System.err.println();
+		//        java.lang.System.exit(0);
+
+		///	Tree allGenesGreedy = Utils.greedyConsensus(greedyCandidates, false,
+		//				GlobalMaps.taxonNameMap.getSpeciesIdMapper()
+		//						.getSTTaxonIdentifier(), true);
+		//		resolveByUPGMA((MutableTree) allGenesGreedy, GlobalMaps.taxonNameMap.getSpeciesIdMapper().getSTTaxonIdentifier(),
+		//				this.speciesSimilarityMatrix);
 
 		
 	//	baseTrees.add(allGenesGreedy);
-		baseTrees.add(UPGMA);
-		addBipartitionsFromSignleIndTreesToX(UPGMA, baseTrees,
+		baseTrees.add(ST);
+		addBipartitionsFromSignleIndTreesToX(ST, baseTrees,
 
 				GlobalMaps.taxonNameMap.getSpeciesIdMapper().getSTTaxonIdentifier()); 
 		
@@ -751,10 +758,8 @@ public class WQDataCollection extends AbstractDataCollection<Tripartition>
 						this.speciesSimilarityMatrix);
 
 				System.err
-						.print("Number of Clusters after addition by greedy: ");
-//						        + clusters.getClusterCount());
-				System.err.println(clusters.getClusterCount());
-//								+ clusters.getClusterCount());
+						.print("Number of Clusters after addition by greedy: "
+						        + clusters.getClusterCount());
 				
 				 gradiant = clusters.getClusterCount() - prev;
 				 System.err.println("gradient"+l+" in heuristiic: "+ gradiant);
@@ -772,16 +777,19 @@ public class WQDataCollection extends AbstractDataCollection<Tripartition>
 	 * gene tree completion.
 	 */
 	private void calculateDistances() {
-		System.err
-				.println("Calculating quartet distance matrix (for completion of X)");
+	    System.err
+	    .println("Calculating quartet distance matrix (for completion of X)");
 
-		this.similarityMatrix = new SimilarityMatrix(GlobalMaps.taxonIdentifier.taxonCount());
-		this.similarityMatrix.populateByQuartetDistance(treeAllClusters, this.originalInompleteGeneTrees);
-//		this.similarityMatrix.pupulateByBranchDistanceBS(this.originalInompleteGeneTrees);
-		this.speciesSimilarityMatrix = GlobalMaps.taxonNameMap
-				.getSpeciesIdMapper().convertToSpeciesDistance(this.similarityMatrix);// this.similarityMatrix.convertToSpeciesDistance(spm);
-//		this.speciesSimilarityMatrix = this.similarityMatrix.matricesByBranchDistance(this.originalInompleteGeneTrees,
-//		        GlobalMaps.taxonNameMap.getSpeciesIdMapper());
+	    this.similarityMatrix = new SimilarityMatrix(GlobalMaps.taxonIdentifier.taxonCount());
+	    if (options.isUstarDist()) {
+	        this.similarityMatrix.populateByQuartetDistance(treeAllClusters, this.originalInompleteGeneTrees);
+	        this.speciesSimilarityMatrix = GlobalMaps.taxonNameMap
+	                .getSpeciesIdMapper().convertToSpeciesDistance(this.similarityMatrix);
+	    } else {
+	        this.speciesSimilarityMatrix = this.similarityMatrix.matricesByBranchDistance(this.originalInompleteGeneTrees,
+	                GlobalMaps.taxonNameMap.getSpeciesIdMapper());
+	        this.speciesDistanceMatrix = this.speciesSimilarityMatrix.convertToDistanceMatrix();
+	    }
 	}
 
 	/**
@@ -891,24 +899,44 @@ public class WQDataCollection extends AbstractDataCollection<Tripartition>
 	 */
 	public void addExtraBipartitionByDistance() {
 
-		for (BitSet bs : speciesSimilarityMatrix.UPGMA()) {
-//	    for (BitSet bs : speciesSimilarityMatrix.convertToDistanceMatrix().PhyDstar(GlobalMaps.taxonNameMap.getSpeciesIdMapper())) {
-	        STITreeCluster g = GlobalMaps.taxonNameMap.getSpeciesIdMapper()
-	                .getGeneClusterForSTCluster(bs);
-	        this.addCompletedSpeciesFixedBipartionToX(g,
-	                g.complementaryCluster());
+	    if (options.isUstarDist()) {
+	        for (BitSet bs : speciesDistanceMatrix.PhyDstar(GlobalMaps.taxonNameMap.getSpeciesIdMapper())) {
+	            STITreeCluster g = GlobalMaps.taxonNameMap.getSpeciesIdMapper()
+	                    .getGeneClusterForSTCluster(bs);
+	            this.addCompletedSpeciesFixedBipartionToX(g,
+	                    g.complementaryCluster());
 
-		}
-		;
-		if (SLOW) {
-			for (BitSet bs : speciesSimilarityMatrix.getQuadraticBitsets()) {
-				STITreeCluster g = GlobalMaps.taxonNameMap.getSpeciesIdMapper()
-						.getGeneClusterForSTCluster(bs);
-				this.addCompletedSpeciesFixedBipartionToX(g,
-						g.complementaryCluster());
-			}
-			;
-		}
+	        }
+	        ;
+	        if (SLOW) {
+	            for (BitSet bs : speciesDistanceMatrix.getQuadraticBitsets()) {
+	                STITreeCluster g = GlobalMaps.taxonNameMap.getSpeciesIdMapper()
+	                        .getGeneClusterForSTCluster(bs);
+	                this.addCompletedSpeciesFixedBipartionToX(g,
+	                        g.complementaryCluster());
+	            }
+	            ;
+	        }
+	    } else {
+	        for (BitSet bs : speciesSimilarityMatrix.UPGMA()) {
+	            STITreeCluster g = GlobalMaps.taxonNameMap.getSpeciesIdMapper()
+	                    .getGeneClusterForSTCluster(bs);
+	            this.addCompletedSpeciesFixedBipartionToX(g,
+	                    g.complementaryCluster());
+
+	        }
+	        ;
+	        if (SLOW) {
+	            for (BitSet bs : speciesSimilarityMatrix.getQuadraticBitsets()) {
+	                STITreeCluster g = GlobalMaps.taxonNameMap.getSpeciesIdMapper()
+	                        .getGeneClusterForSTCluster(bs);
+	                this.addCompletedSpeciesFixedBipartionToX(g,
+	                        g.complementaryCluster());
+	            }
+	            ;
+	        }
+	    }
+
 
 		System.err.println("Number of Clusters after addition by distance: "
 				+ clusters.getClusterCount());
@@ -1039,12 +1067,16 @@ public class WQDataCollection extends AbstractDataCollection<Tripartition>
 
 				System.err.print("polytomy of size " + greedyNode.getChildCount());
 				
-				this.addSubSampledBitSetToX(
-						this.speciesSimilarityMatrix.resolveByUPGMA(
-								Arrays.asList(childbs), true), tid);
-//				this.addSubSampledBitSetToX(
-//                        this.speciesSimilarityMatrix.convertToDistanceMatrix().resolveByPhyDstar(
-//                                Arrays.asList(childbs), true), tid);
+				if (options.isUstarDist()) {
+				    this.addSubSampledBitSetToX(
+	                        this.speciesDistanceMatrix.resolveByPhyDstar(
+	                                Arrays.asList(childbs), true), tid);
+				} else {
+				    this.addSubSampledBitSetToX(
+	                        this.speciesSimilarityMatrix.resolveByUPGMA(
+	                                Arrays.asList(childbs), true), tid);
+				}
+				
 
 				// Resolve by subsampling the greedy.
 				// Don't get confused. We are not subsampling species
@@ -1299,17 +1331,22 @@ public class WQDataCollection extends AbstractDataCollection<Tripartition>
 		boolean added = false;
 
 		SimilarityMatrix sampleSimMatrix = sm.getInducedMatrix(randomSample,
-				tid);
+		        tid);
 
-		added |= this.addDoubleSubSampledBitSetToX(polytomyBSList,
-				sampleSimMatrix.UPGMA(), tid);
-//		added |= this.addDoubleSubSampledBitSetToX(polytomyBSList,
-//                sampleSimMatrix.convertToDistanceMatrix().PhyDstar(GlobalMaps.taxonNameMap.getSpeciesIdMapper()), tid);
-//		System.out.println(sampleSimMatrix.getSize());
-
-		if (quartetAddition) {
-			added |= this.addDoubleSubSampledBitSetToX(polytomyBSList,
-					sampleSimMatrix.getQuadraticBitsets(), tid);
+		if (options.isUstarDist()) {
+		    added |= this.addDoubleSubSampledBitSetToX(polytomyBSList,
+		            sampleSimMatrix.convertToDistanceMatrix().PhyDstar(GlobalMaps.taxonNameMap.getSpeciesIdMapper()), tid);
+		    if (quartetAddition) {
+		        added |= this.addDoubleSubSampledBitSetToX(polytomyBSList,
+		                sampleSimMatrix.convertToDistanceMatrix().getQuadraticBitsets(), tid);
+		    }
+		} else {
+		    added |= this.addDoubleSubSampledBitSetToX(polytomyBSList,
+		            sampleSimMatrix.UPGMA(), tid);
+		    if (quartetAddition) {
+		        added |= this.addDoubleSubSampledBitSetToX(polytomyBSList,
+		                sampleSimMatrix.getQuadraticBitsets(), tid);
+		    }
 		}
 		return added;
 	}

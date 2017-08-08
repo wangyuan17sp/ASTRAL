@@ -38,7 +38,7 @@ public class DistanceMatrix {
     public int getSize() {
         return n;
     }
-
+ 
     public float get(int i, int j) {
         return this.distanceMatrix[i][j];
     }

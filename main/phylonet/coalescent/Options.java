@@ -20,6 +20,8 @@ public class Options {
 	private double CS;
 	private double CD;
 	private double trim;
+	
+	private boolean ustarDist;
 
 	public Options(boolean rooted, boolean extrarooted, 
 			boolean exactSolution, boolean duploss, int alg, int addExtra,
@@ -39,6 +41,7 @@ public class Options {
 		this.setOutputFile(outputFile);
 		this.setSamplingrounds(samplingrounds);
 		this.trim = trim;
+		this.setUstarDist(true);
 	}
 
 	public boolean isRooted() {
@@ -178,4 +181,12 @@ public class Options {
 	public void setSamplingrounds(Integer samplingrounds) {
 		this.samplingrounds = samplingrounds;
 	}
+
+    public boolean isUstarDist() {
+        return ustarDist;
+    }
+
+    public void setUstarDist(boolean ustarDist) {
+        this.ustarDist = ustarDist;
+    }
 }
