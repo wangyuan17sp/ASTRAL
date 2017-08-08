@@ -679,16 +679,16 @@ public class WQDataCollection extends AbstractDataCollection<Tripartition>
 
 		ArrayList<Tree> baseTrees = new ArrayList<Tree>();
 		List<STITreeCluster> upgma = new ArrayList<STITreeCluster>();
-//		for(BitSet b : this.speciesSimilarityMatrix.UPGMA()){
-//			STITreeCluster sti = new STITreeCluster(GlobalMaps.taxonNameMap.getSpeciesIdMapper().getSTTaxonIdentifier());
-//			sti.setCluster(b);
-//			upgma.add(sti);
-//		}
-		for(BitSet b : this.speciesSimilarityMatrix.convertToDistanceMatrix().PhyDstar(GlobalMaps.taxonNameMap.getSpeciesIdMapper())){
-            STITreeCluster sti = new STITreeCluster(GlobalMaps.taxonNameMap.getSpeciesIdMapper().getSTTaxonIdentifier());
-            sti.setCluster(b);
-            upgma.add(sti);
-        }
+		for(BitSet b : this.speciesSimilarityMatrix.UPGMA()){
+			STITreeCluster sti = new STITreeCluster(GlobalMaps.taxonNameMap.getSpeciesIdMapper().getSTTaxonIdentifier());
+			sti.setCluster(b);
+			upgma.add(sti);
+		}
+//		for(BitSet b : this.speciesSimilarityMatrix.convertToDistanceMatrix().PhyDstar(GlobalMaps.taxonNameMap.getSpeciesIdMapper())){
+//            STITreeCluster sti = new STITreeCluster(GlobalMaps.taxonNameMap.getSpeciesIdMapper().getSTTaxonIdentifier());
+//            sti.setCluster(b);
+//            upgma.add(sti);
+//        }
 		Tree UPGMA = Utils.buildTreeFromClusters(upgma, GlobalMaps.taxonNameMap.getSpeciesIdMapper().getSTTaxonIdentifier(), false);
 //		Tree PhyDstar = Utils.buildTreeFromClusters(phyDstar, GlobalMaps.taxonNameMap.getSpeciesIdMapper().getSTTaxonIdentifier(), false);
 //		System.out.println(UPGMA.toNewick());
@@ -776,12 +776,12 @@ public class WQDataCollection extends AbstractDataCollection<Tripartition>
 				.println("Calculating quartet distance matrix (for completion of X)");
 
 		this.similarityMatrix = new SimilarityMatrix(GlobalMaps.taxonIdentifier.taxonCount());
-//		this.similarityMatrix.populateByQuartetDistance(treeAllClusters, this.originalInompleteGeneTrees);
+		this.similarityMatrix.populateByQuartetDistance(treeAllClusters, this.originalInompleteGeneTrees);
 //		this.similarityMatrix.pupulateByBranchDistanceBS(this.originalInompleteGeneTrees);
-//		this.speciesSimilarityMatrix = GlobalMaps.taxonNameMap
-//				.getSpeciesIdMapper().convertToSpeciesDistance(this.similarityMatrix);// this.similarityMatrix.convertToSpeciesDistance(spm);
-		this.speciesSimilarityMatrix = this.similarityMatrix.matricesByBranchDistance(this.originalInompleteGeneTrees,
-		        GlobalMaps.taxonNameMap.getSpeciesIdMapper());
+		this.speciesSimilarityMatrix = GlobalMaps.taxonNameMap
+				.getSpeciesIdMapper().convertToSpeciesDistance(this.similarityMatrix);// this.similarityMatrix.convertToSpeciesDistance(spm);
+//		this.speciesSimilarityMatrix = this.similarityMatrix.matricesByBranchDistance(this.originalInompleteGeneTrees,
+//		        GlobalMaps.taxonNameMap.getSpeciesIdMapper());
 	}
 
 	/**
@@ -891,8 +891,8 @@ public class WQDataCollection extends AbstractDataCollection<Tripartition>
 	 */
 	public void addExtraBipartitionByDistance() {
 
-//		for (BitSet bs : speciesSimilarityMatrix.UPGMA()) {
-	    for (BitSet bs : speciesSimilarityMatrix.convertToDistanceMatrix().PhyDstar(GlobalMaps.taxonNameMap.getSpeciesIdMapper())) {
+		for (BitSet bs : speciesSimilarityMatrix.UPGMA()) {
+//	    for (BitSet bs : speciesSimilarityMatrix.convertToDistanceMatrix().PhyDstar(GlobalMaps.taxonNameMap.getSpeciesIdMapper())) {
 	        STITreeCluster g = GlobalMaps.taxonNameMap.getSpeciesIdMapper()
 	                .getGeneClusterForSTCluster(bs);
 	        this.addCompletedSpeciesFixedBipartionToX(g,
@@ -901,7 +901,7 @@ public class WQDataCollection extends AbstractDataCollection<Tripartition>
 		}
 		;
 		if (SLOW) {
-			for (BitSet bs : speciesSimilarityMatrix.convertToDistanceMatrix().getQuadraticBitsets()) {
+			for (BitSet bs : speciesSimilarityMatrix.getQuadraticBitsets()) {
 				STITreeCluster g = GlobalMaps.taxonNameMap.getSpeciesIdMapper()
 						.getGeneClusterForSTCluster(bs);
 				this.addCompletedSpeciesFixedBipartionToX(g,
@@ -1039,12 +1039,12 @@ public class WQDataCollection extends AbstractDataCollection<Tripartition>
 
 				System.err.print("polytomy of size " + greedyNode.getChildCount());
 				
-//				this.addSubSampledBitSetToX(
-//						this.speciesSimilarityMatrix.resolveByUPGMA(
-//								Arrays.asList(childbs), true), tid);
 				this.addSubSampledBitSetToX(
-                        this.speciesSimilarityMatrix.convertToDistanceMatrix().resolveByPhyDstar(
-                                Arrays.asList(childbs), true), tid);
+						this.speciesSimilarityMatrix.resolveByUPGMA(
+								Arrays.asList(childbs), true), tid);
+//				this.addSubSampledBitSetToX(
+//                        this.speciesSimilarityMatrix.convertToDistanceMatrix().resolveByPhyDstar(
+//                                Arrays.asList(childbs), true), tid);
 
 				// Resolve by subsampling the greedy.
 				// Don't get confused. We are not subsampling species
@@ -1301,22 +1301,15 @@ public class WQDataCollection extends AbstractDataCollection<Tripartition>
 		SimilarityMatrix sampleSimMatrix = sm.getInducedMatrix(randomSample,
 				tid);
 
-//		added |= this.addDoubleSubSampledBitSetToX(polytomyBSList,
-//				sampleSimMatrix.UPGMA(), tid);
 		added |= this.addDoubleSubSampledBitSetToX(polytomyBSList,
-                sampleSimMatrix.convertToDistanceMatrix().PhyDstar(GlobalMaps.taxonNameMap.getSpeciesIdMapper()), tid);
-		System.out.println(sampleSimMatrix.getSize());
-		
-//		for (int i = 0; i < sampleSimMatrix.getSize(); i++) {
-//		    for (int j = 0; j < sampleSimMatrix.getSize(); j++) {
-//		        System.out.print(sampleSimMatrix.get(i, j) + " ");
-//		    }
-//		    System.out.println();
-//		}
+				sampleSimMatrix.UPGMA(), tid);
+//		added |= this.addDoubleSubSampledBitSetToX(polytomyBSList,
+//                sampleSimMatrix.convertToDistanceMatrix().PhyDstar(GlobalMaps.taxonNameMap.getSpeciesIdMapper()), tid);
+//		System.out.println(sampleSimMatrix.getSize());
 
 		if (quartetAddition) {
 			added |= this.addDoubleSubSampledBitSetToX(polytomyBSList,
-					sampleSimMatrix.convertToDistanceMatrix().getQuadraticBitsets(), tid);
+					sampleSimMatrix.getQuadraticBitsets(), tid);
 		}
 		return added;
 	}
