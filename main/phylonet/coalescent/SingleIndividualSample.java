@@ -32,13 +32,13 @@ public class SingleIndividualSample {
 	//private TaxonIdentifier sampleSpecificTaxonIdentifier;
 	// TODO: maybe we should take the distance matrix out of this class.
 	//       not sure why it's here. 
-	private SimilarityMatrix similarityMatrix;
+	//private Matrix similarityMatrix;
 	/**
 	 * Size of the sample. 
 	 */
 	private int sampleSize;
 
-	public SingleIndividualSample(SpeciesMapper spm, SimilarityMatrix matrix) {
+	public SingleIndividualSample(SpeciesMapper spm, Matrix matrix) {
 		sampleGlobalIDs = new ArrayList<Integer>();
 		sampleNames = new ArrayList<String>();
 		//sampleSpecificTaxonIdentifier = new TaxonIdentifier();
@@ -55,7 +55,7 @@ public class SingleIndividualSample {
     	}
 		setSampleSize(sampleGlobalIDs.size());
 		
-		this.similarityMatrix = matrix.getInducedMatrix(this.sampleGlobalIDs);
+		//this.similarityMatrix = matrix.getInducedMatrix(this.sampleGlobalIDs);
 	}
 	
 	
@@ -82,12 +82,6 @@ public class SingleIndividualSample {
 //	public TaxonIdentifier getTaxonIdentifier() {
 //		return this.sampleSpecificTaxonIdentifier;
 //	}
-
-
-
-	public SimilarityMatrix getSimilarityMatrix() {
-		return this.similarityMatrix;
-	}
 
 	public int getSampleSize() {
 		return sampleSize;

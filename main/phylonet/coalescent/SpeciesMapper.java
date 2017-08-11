@@ -217,7 +217,7 @@ public class SpeciesMapper {
      * @param matrix A distance matrix with one row per individual
      * @return A distance matrix with one row per species
      */
-    SimilarityMatrix convertToSpeciesDistance(SimilarityMatrix matrix) {
+     SimilarityMatrix convertToSpeciesDistance(Matrix matrix) {
 		float [][] STsimMatrix = new float[this.getSpeciesCount()][this.getSpeciesCount()];
 		float[][] denum = new float[this.getSpeciesCount()][this.getSpeciesCount()];
 		int n = matrix.getSize();
