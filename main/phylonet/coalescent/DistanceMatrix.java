@@ -407,9 +407,7 @@ public class DistanceMatrix extends AbstractMatrix implements Matrix {
             }           
         }
     
-        //        System.out.println(GlobalMaps.taxonIdentifier.taxonCount());
         for (int i = 0; i < n; i++) {
-            //            System.out.print(GlobalMaps.taxonIdentifier.getTaxonName(i) + " ");
             for (int j = 0; j < n; j++) {
                 if (i == j) {
                     matrix[i][j] = 0;
@@ -421,9 +419,7 @@ public class DistanceMatrix extends AbstractMatrix implements Matrix {
                         matrix[i][j] = -99; 
                     }
                 }
-                //                System.out.print(similarityMatrix[i][j] + " ");         
             }
-            //            System.out.println();
         }
     }
 
@@ -447,7 +443,6 @@ public class DistanceMatrix extends AbstractMatrix implements Matrix {
                     STsimMatrix[i][j] / denum[i][j];
             }
             STsimMatrix[i][i] = 0;
-            //System.err.println(Arrays.toString(this.distSTMatrix[i]));
         }
         SimilarityMatrix ret = new SimilarityMatrix(STsimMatrix);
     

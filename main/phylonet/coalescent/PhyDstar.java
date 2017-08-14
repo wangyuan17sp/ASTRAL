@@ -1559,7 +1559,7 @@ public class PhyDstar
 
 
     out.close();
-    System.out.println("");
+//    System.out.println("");
 
 
     }
