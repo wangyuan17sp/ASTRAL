@@ -50,7 +50,7 @@ public class SimilarityMatrix extends AbstractMatrix implements Matrix {
 
 
     List<BitSet> UPGMA() {
-    
+        
         List<BitSet> bsList = new ArrayList<BitSet>(n);
         List<TreeSet<Integer>> indsBySim = new ArrayList<TreeSet<Integer>>(n);
         List<float[]> sims = new ArrayList<float[]>(n);
@@ -69,6 +69,7 @@ public class SimilarityMatrix extends AbstractMatrix implements Matrix {
             range.add(i,i);
             indsBySim.add(sortColumn);
         }
+        
     
         return upgmaLoop(weights, bsList, indsBySim, sims, n, false);
     }
@@ -241,7 +242,7 @@ public class SimilarityMatrix extends AbstractMatrix implements Matrix {
 
     @Override
     public List<BitSet> inferTreeBitsets() {
-    
+        
         return UPGMA();
     }
 

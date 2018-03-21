@@ -565,6 +565,7 @@ implements Cloneable {
         }
 
         System.err.println("Building set of clusters (X) from gene trees ");
+        long st1 = System.currentTimeMillis();
 
         //        List<STITreeCluster> upgma = new ArrayList<STITreeCluster>();
         //        Iterable<STITreeCluster> upgma_it = upgma;
@@ -582,7 +583,7 @@ implements Cloneable {
         //		
         int firstRoundSampling = 400;
 
-        System.err.println("Number of Default Clusters: " + clusters.getClusterCount());
+//        System.err.println("Number of Default Clusters: " + clusters.getClusterCount());
 
 
         int secondRoundSampling = getSamplingRepeationFactor(inference.options.getSamplingrounds());;
@@ -737,6 +738,8 @@ implements Cloneable {
         gradiant = 0;
         if (inference.getAddExtra() != 0) {
             this.addExtraBipartitionByDistance();
+            System.err.println("Addition by distance takes "
+                    + (System.currentTimeMillis() - st1) / 1000.0D + " secs");
             for (int l = 0; l < secondRoundSampling; l++) {
                 ArrayList<Tree> genes = new ArrayList<Tree>();
                 for (int j = 0; j < allGreedies.length; j++) {
@@ -745,10 +748,16 @@ implements Cloneable {
                 System.err
                 .println("calculating extra bipartitions to be added at level "
                         + inference.getAddExtra() + " ...");
+                
+                long st2 = System.currentTimeMillis();
+                
                 this.addExtraBipartitionByHeuristics(genes,
                         GlobalMaps.taxonNameMap.getSpeciesIdMapper()
                         .getSTTaxonIdentifier());
 
+                System.err.println("Addition by greedy takes "
+                        + (System.currentTimeMillis() - st2) / 1000.0D + " secs");
+                
                 System.err
                 .println("Number of Clusters after addition by greedy: "
                         + clusters.getClusterCount());
@@ -1039,7 +1048,7 @@ implements Cloneable {
                 comp.flip(0, tid.taxonCount());
                 childbs[i1] = comp;
 
-                System.err.print("polytomy of size " + greedyNode.getChildCount());
+                System.err.println("polytomy of size " + greedyNode.getChildCount());
 
 
                 this.addSubSampledBitSetToX(
@@ -1098,11 +1107,11 @@ implements Cloneable {
      * @param polytomyBSList
      * @return
      */
-    //	private boolean resolveByUPGMA(BitSet[] polytomyBSList,
-    //			SingleIndividualSample sis, TaxonIdentifier id) {
-    //		return this.addSubSampledBitSetToX(sis.getSimilarityMatrix()
-    //				.resolveByUPGMA(Arrays.asList(polytomyBSList), true), id);
-    //	}
+//    	private boolean resolveByUPGMA(BitSet[] polytomyBSList,
+//    			SingleIndividualSample sis, TaxonIdentifier id) {
+//    		return this.addSubSampledBitSetToX(sis.getSimilarityMatrix()
+//    				.resolveByUPGMA(Arrays.asList(polytomyBSList), true), id);
+//    	}
 
     /**
      * This is the first step of the greedy algorithm where one counts how many

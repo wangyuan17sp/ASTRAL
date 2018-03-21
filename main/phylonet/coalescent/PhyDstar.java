@@ -116,12 +116,12 @@ public class PhyDstar
     static double[] lambda;      // weights for computing reduction distance matrices 
 
     //##### newick output tree #####
-    static BufferedWriter out;        // to write the trees inside an output file 
+    static Writer out;        // to write the trees inside an output file 
     static String newick;             // outputed tree in newick format
     static BitSet nodeFixed;          // to set the postfixed nodes
     static int root;                  // the leaf root of the outputed tree
     
-    public static void main(String[] args) throws IOException {
+    public static String main(String[] args) throws IOException {
 
     compDesc = new Comparator<Object>() {     // a comparator dedicated to the DistanceTuple class
         CriterionTuple ct1; CriterionTuple ct2;
@@ -182,13 +182,10 @@ public class PhyDstar
         b = -1;
         while ( ++b < args.length ) {
         if ( args[b].toLowerCase().equals("-i") ) {
-            try { 
+           
             dinfile = args[++b];
-            ind = new BufferedReader(new FileReader(new File(dinfile)));
-            } catch( FileNotFoundException e ) {
-            System.out.println("Incorrect input file name (option -i)");
-            System.exit(0);
-            }
+            ind = new BufferedReader(new StringReader(dinfile));
+            
             continue;
         }
         if ( args[b].toLowerCase().equals("-v") ) {
@@ -397,7 +394,7 @@ public class PhyDstar
         System.out.print("\n");
     }
 
-    if ( bionj ) out = new BufferedWriter(new FileWriter(new File (dinfile + "_bionj.t")));
+    if ( bionj ) out = new StringWriter();
     if ( nj )  out = new BufferedWriter(new FileWriter(new File (dinfile + "_nj.t")));
     if ( unj ) out = new BufferedWriter(new FileWriter(new File (dinfile + "_unj.t")));
     if ( mvr ) out = new BufferedWriter(new FileWriter(new File (dinfile + "_mvr.t")));
@@ -1557,10 +1554,10 @@ public class PhyDstar
         } // end of while(multifile
 
 
-
+    String outS = out.toString();
     out.close();
 //    System.out.println("");
-
+    return outS;
 
     }
 
